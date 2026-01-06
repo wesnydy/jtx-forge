@@ -1,4 +1,5 @@
 import { jest, beforeAll, describe, expect, it } from '@jest/globals';
+
 jest.mock('@/versions/v1.0/utils/ajv-instance-cache', () => ({
   __esModule: true,
   default: {
@@ -34,7 +35,8 @@ describe('Boletim JSON Validator v1.0', () => {
     });
 
     it('should return validation as false with an errors list when input is invalid', () => {
-      const mockValidate = jest.fn().mockReturnValue(false) as jest.Mock & { errors?: unknown[] };
+      const mockValidate = jest.fn() as jest.Mock & { errors?: unknown[] };
+      mockValidate.mockReturnValue(false);
       mockValidate.errors = [
         {
           instancePath: '/Boletim/Versao',
@@ -58,7 +60,8 @@ describe('Boletim JSON Validator v1.0', () => {
     });
 
     it('should return an empty errors list when input is invalid but no validation errors are provided', () => {
-      const mockValidate = jest.fn().mockReturnValue(false) as jest.Mock & { errors?: unknown[] };
+      const mockValidate = jest.fn() as jest.Mock & { errors?: unknown[] };
+      mockValidate.mockReturnValue(false);
       mockValidate.errors = undefined;
 
       (ajvInstanceCache.getSchema as jest.Mock).mockImplementationOnce(() => mockValidate);
@@ -72,7 +75,8 @@ describe('Boletim JSON Validator v1.0', () => {
 
   describe('Validation success handling', () => {
     it('should return validation as true with an empty errors list when input is valid', () => {
-      const mockValidate = jest.fn().mockReturnValue(true) as jest.Mock & { errors?: unknown[] };
+      const mockValidate = jest.fn() as jest.Mock & { errors?: unknown[] };
+      mockValidate.mockReturnValue(true);
 
       (ajvInstanceCache.getSchema as jest.Mock).mockImplementationOnce(() => mockValidate);
 
