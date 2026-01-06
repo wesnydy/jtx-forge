@@ -24,7 +24,7 @@ jobs:
           npm run test:coverage
 
       - name: Upload coverage to Coveralls
-        uses: coverallsapp/github-action@v2.3.6
+        uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v4
