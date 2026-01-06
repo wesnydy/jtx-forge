@@ -1,4 +1,4 @@
-name: JTX Forge Workflow
+name: build
 
 on:
   push:
