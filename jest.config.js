@@ -17,4 +17,5 @@ module.exports = {
   coverageDirectory: 'coverage',
   coverageProvider: 'v8',
   coverageReporters: ['text', 'lcov'],
+  coveragePathIgnorePatterns: ['\\.d\\.ts$', '\\.interface\\.ts$', 'types\\.ts$'],
 };
