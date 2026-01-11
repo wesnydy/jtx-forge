@@ -3,163 +3,25 @@
   "$id": "http://www.example.org/boletim-types.schema.json",
   "title": "Boletim Types Schema",
   "$defs": {
-    "InstituicaoType": {
+    "CabecalhoType": {
       "type": "object",
       "required": [
-        "Nome",
-        "CNPJ",
-        "Endereco"
+        "Instituicao",
+        "IdentificadorDocumento",
+        "DataEmissao"
       ],
       "properties": {
-        "Nome": {
-          "$ref": "simple-types.schema.json#/$defs/StringType"
+        "Instituicao": {
+          "$ref": "institucional-types.schema.json#/$defs/InstituicaoType"
         },
-        "CNPJ": {
-          "$ref": "simple-types.schema.json#/$defs/CNPJType"
-        },
-        "Unidade": {
-          "$ref": "simple-types.schema.json#/$defs/StringType"
-        },
-        "Endereco": {
-          "$ref": "#/$defs/EnderecoType"
-        },
-        "Contato": {
-          "$ref": "#/$defs/ContatoType"
-        }
-      },
-      "additionalProperties": false
-    },
-    "EstudanteType": {
-      "type": "object",
-      "required": [
-        "ID",
-        "Nome",
-        "CPF"
-      ],
-      "properties": {
-        "ID": {
+        "IdentificadorDocumento": {
           "$ref": "simple-types.schema.json#/$defs/IDType"
         },
-        "Nome": {
+        "Emitente": {
           "$ref": "simple-types.schema.json#/$defs/StringType"
         },
-        "CPF": {
-          "$ref": "simple-types.schema.json#/$defs/CPFType"
-        }
-      },
-      "additionalProperties": false
-    },
-    "CursoType": {
-      "type": "object",
-      "required": [
-        "Nome",
-        "Codigo"
-      ],
-      "properties": {
-        "Nome": {
-          "$ref": "simple-types.schema.json#/$defs/StringType"
-        },
-        "Codigo": {
-          "$ref": "simple-types.schema.json#/$defs/StringType"
-        },
-        "Nivel": {
-          "$ref": "simple-types.schema.json#/$defs/NivelCursoType"
-        }
-      },
-      "additionalProperties": false
-    },
-    "DisciplinaType": {
-      "type": "object",
-      "required": [
-        "Nome",
-        "Codigo",
-        "Creditos",
-        "CargaHoraria",
-        "Situacao"
-      ],
-      "oneOf": [
-        {
-          "required": [
-            "Nota"
-          ],
-          "properties": {
-            "Nota": {
-              "$ref": "simple-types.schema.json#/$defs/NotaType"
-            }
-          }
-        },
-        {
-          "required": [
-            "NotaEscala"
-          ],
-          "properties": {
-            "NotaEscala": {
-              "$ref": "simple-types.schema.json#/$defs/EscalaConceitoType"
-            }
-          }
-        }
-      ],
-      "properties": {
-        "Nome": {
-          "$ref": "simple-types.schema.json#/$defs/StringType"
-        },
-        "Codigo": {
-          "$ref": "simple-types.schema.json#/$defs/NumberType"
-        },
-        "Creditos": {
-          "$ref": "simple-types.schema.json#/$defs/NumberType"
-        },
-        "CargaHoraria": {
-          "$ref": "simple-types.schema.json#/$defs/NumberType"
-        },
-        "Frequencia": {
-          "$ref": "simple-types.schema.json#/$defs/PercentType"
-        },
-        "Situacao": {
-          "$ref": "simple-types.schema.json#/$defs/SituacaoType"
-        },
-        "Comentarios": {
-          "$ref": "simple-types.schema.json#/$defs/StringType"
-        },
-        "Nota": true,
-        "NotaEscala": true
-      },
-      "additionalProperties": false
-    },
-    "PeriodoType": {
-      "type": "object",
-      "required": [
-        "Codigo",
-        "Inicio",
-        "Fim",
-        "Disciplinas"
-      ],
-      "properties": {
-        "Codigo": {
-          "$ref": "simple-types.schema.json#/$defs/StringType"
-        },
-        "Inicio": {
+        "DataEmissao": {
           "$ref": "simple-types.schema.json#/$defs/DateType"
-        },
-        "Fim": {
-          "$ref": "simple-types.schema.json#/$defs/DateType"
-        },
-        "Disciplinas": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {
-            "type": "object",
-            "required": [
-              "Disciplina"
-            ],
-            "properties": {
-              "Disciplina": {
-                "$ref": "#/$defs/DisciplinaType"
-              }
-            },
-            "additionalProperties": false
-          }
         }
       },
       "additionalProperties": false
@@ -207,55 +69,22 @@
       },
       "additionalProperties": false
     },
-    "EnderecoType": {
-      "type": "object",
-      "required": [
-        "Logradouro",
-        "Numero",
-        "Bairro",
-        "Cidade",
-        "UF",
-        "CEP"
-      ],
-      "properties": {
-        "Logradouro": {
-          "$ref": "simple-types.schema.json#/$defs/StringType"
+    "AssinaturaArrayType": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "required": [
+          "Assinatura"
+        ],
+        "properties": {
+          "Assinatura": {
+            "$ref": "#/$defs/AssinaturaType"
+          }
         },
-        "Numero": {
-          "$ref": "simple-types.schema.json#/$defs/NumberType"
-        },
-        "Complemento": {
-          "$ref": "simple-types.schema.json#/$defs/StringType"
-        },
-        "Bairro": {
-          "$ref": "simple-types.schema.json#/$defs/StringType"
-        },
-        "Cidade": {
-          "$ref": "simple-types.schema.json#/$defs/StringType"
-        },
-        "UF": {
-          "$ref": "simple-types.schema.json#/$defs/UFType"
-        },
-        "CEP": {
-          "$ref": "simple-types.schema.json#/$defs/CEPType"
-        }
-      },
-      "additionalProperties": false
-    },
-    "ContatoType": {
-      "type": "object",
-      "required": [
-        "Telefone"
-      ],
-      "properties": {
-        "Telefone": {
-          "$ref": "simple-types.schema.json#/$defs/PhoneType"
-        },
-        "Email": {
-          "$ref": "simple-types.schema.json#/$defs/StringType"
-        }
-      },
-      "additionalProperties": false
+        "additionalProperties": false
+      }
     }
   }
 }

@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://www.example.org/institucional-types.schema.json",
+  "title": "Institucional Types Schema",
+  "$defs": {
+    "InstituicaoType": {
+      "type": "object",
+      "required": [
+        "Nome",
+        "CNPJ",
+        "Endereco"
+      ],
+      "properties": {
+        "Nome": {
+          "$ref": "simple-types.schema.json#/$defs/StringType"
+        },
+        "CNPJ": {
+          "$ref": "simple-types.schema.json#/$defs/CNPJType"
+        },
+        "Unidade": {
+          "$ref": "simple-types.schema.json#/$defs/StringType"
+        },
+        "Endereco": {
+          "$ref": "localizacao-types.schema.json#/$defs/EnderecoType"
+        },
+        "Contato": {
+          "$ref": "localizacao-types.schema.json#/$defs/ContatoType"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

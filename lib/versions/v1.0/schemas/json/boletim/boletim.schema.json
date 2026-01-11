@@ -28,16 +28,7 @@
       "minItems": 1,
       "uniqueItems": true,
       "items": {
-        "type": "object",
-        "required": [
-          "Boletim"
-        ],
-        "properties": {
-          "Boletim": {
-            "$ref": "boletim.schema.json#/$defs/BoletimType"
-          }
-        },
-        "additionalProperties": false
+        "$ref": "boletim.schema.json#/$defs/Boletim"
       }
     },
     "BoletimType": {
@@ -56,73 +47,26 @@
           "const": "1.0"
         },
         "Cabecalho": {
-          "type": "object",
-          "required": [
-            "Instituicao",
-            "IdentificadorDocumento",
-            "DataEmissao"
-          ],
-          "properties": {
-            "Instituicao": {
-              "$ref": "boletim-types.schema.json#/$defs/InstituicaoType"
-            },
-            "IdentificadorDocumento": {
-              "$ref": "simple-types.schema.json#/$defs/IDType"
-            },
-            "Emitente": {
-              "$ref": "simple-types.schema.json#/$defs/StringType"
-            },
-            "DataEmissao": {
-              "$ref": "simple-types.schema.json#/$defs/DateType"
-            }
-          },
-          "additionalProperties": false
+          "$ref": "boletim-types.schema.json#/$defs/CabecalhoType"
         },
         "Estudante": {
-          "$ref": "boletim-types.schema.json#/$defs/EstudanteType"
+          "$ref": "pessoal-types.schema.json#/$defs/EstudanteType"
         },
         "Curso": {
-          "$ref": "boletim-types.schema.json#/$defs/CursoType"
+          "$ref": "academico-types.schema.json#/$defs/CursoType"
         },
         "Periodos": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {
-            "type": "object",
-            "required": [
-              "Periodo"
-            ],
-            "properties": {
-              "Periodo": {
-                "$ref": "boletim-types.schema.json#/$defs/PeriodoType"
-              }
-            },
-            "additionalProperties": false
-          }
+          "$ref": "academico-types.schema.json#/$defs/PeriodoArrayType"
         },
         "ResumoAcademico": {
           "$ref": "boletim-types.schema.json#/$defs/ResumoAcademicoType"
         },
         "Assinaturas": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {
-            "type": "object",
-            "required": [
-              "Assinatura"
-            ],
-            "properties": {
-              "Assinatura": {
-                "$ref": "boletim-types.schema.json#/$defs/AssinaturaType"
-              }
-            },
-            "additionalProperties": false
-          }
+          "$ref": "boletim-types.schema.json#/$defs/AssinaturaArrayType"
         }
       },
       "additionalProperties": false
     }
-  }
+  },
+  "additionalProperties": false
 }

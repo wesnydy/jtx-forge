@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://www.example.org/localizacao-types.schema.json",
+  "title": "Localização Types Schema",
+  "$defs": {
+    "EnderecoType": {
+      "type": "object",
+      "required": [
+        "Logradouro",
+        "Numero",
+        "Bairro",
+        "Cidade",
+        "UF",
+        "CEP"
+      ],
+      "properties": {
+        "Logradouro": {
+          "$ref": "simple-types.schema.json#/$defs/StringType"
+        },
+        "Numero": {
+          "$ref": "simple-types.schema.json#/$defs/NumberType"
+        },
+        "Complemento": {
+          "$ref": "simple-types.schema.json#/$defs/StringType"
+        },
+        "Bairro": {
+          "$ref": "simple-types.schema.json#/$defs/StringType"
+        },
+        "Cidade": {
+          "$ref": "simple-types.schema.json#/$defs/StringType"
+        },
+        "UF": {
+          "$ref": "simple-types.schema.json#/$defs/UFType"
+        },
+        "CEP": {
+          "$ref": "simple-types.schema.json#/$defs/CEPType"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ContatoType": {
+      "type": "object",
+      "required": [
+        "Telefone"
+      ],
+      "properties": {
+        "Telefone": {
+          "$ref": "simple-types.schema.json#/$defs/PhoneType"
+        },
+        "Email": {
+          "$ref": "simple-types.schema.json#/$defs/StringType"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
