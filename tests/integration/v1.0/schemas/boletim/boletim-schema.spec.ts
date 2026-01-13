@@ -204,7 +204,7 @@ describe('Boletim JSON Schema v1.0', () => {
       );
 
       const typeValidator = ajvInstance.getSchema(boletimTypeRef)!;
-      const validationResult = typeValidator(invalidInput as unknown);
+      const validationResult = typeValidator(invalidInput);
 
       expect(validationResult).toBe(false);
       expect(typeValidator.errors?.at(0)).toMatchObject({
