@@ -8,7 +8,7 @@
     "start:dev": "tsx watch lib/index.ts",
     "test": "jest --verbose",
     "test:coverage": "jest --coverage",
-    "build": "rm -rf dist && tsc --outDir dist && rsync -a --include='*/' --include='*.json' --exclude='*' --prune-empty-dirs lib/ dist/",
+    "build": "rm -rf dist && tsc --outDir dist && rsync -a --include='*/' --include='*.schema.json' --exclude='*' --prune-empty-dirs lib/ dist/",
     "prepare": "husky"
   },
   "keywords": [],

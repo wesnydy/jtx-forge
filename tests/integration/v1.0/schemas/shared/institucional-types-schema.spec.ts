@@ -5,45 +5,32 @@ import path from 'node:path';
 
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
+
 import JSONSchemaURIs from '@/versions/v1.0/utils/json-schema-uris';
+import loadFixture from '@tests/utils/load-fixture';
 
 describe('Institucional Types JSON Schema v1.0', () => {
   let ajvInstance: Ajv;
 
   beforeAll(async () => {
-    const simpleTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/shared/simple-types.schema.json',
-      ),
-      'utf-8',
-    );
-    const simpleTypesObject = JSON.parse(simpleTypesString);
+    const schemasPath = path.resolve(__dirname, '../../../../../lib/versions/v1.0/schemas/json');
 
-    const localizacaoTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/shared/localizacao-types.schema.json',
-      ),
-      'utf-8',
-    );
-    const localizacaoTypesObject = JSON.parse(localizacaoTypesString);
+    const schemasFiles = await Promise.all([
+      fs.readFile(path.join(schemasPath, 'shared/institucional-types.schema.json'), 'utf-8'),
+      fs.readFile(path.join(schemasPath, 'shared/localizacao-types.schema.json'), 'utf-8'),
+      fs.readFile(path.join(schemasPath, 'shared/simple-types.schema.json'), 'utf-8'),
+    ]);
 
-    const institucionalTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/shared/institucional-types.schema.json',
-      ),
-      'utf-8',
+    const [institucionalTypesSchema, localizacaoTypesSchema, simpleTypesSchema] = schemasFiles.map(
+      (file) => JSON.parse(file),
     );
-    const institucionalTypesObject = JSON.parse(institucionalTypesString);
 
     ajvInstance = new Ajv({ allErrors: true, strict: false });
     addFormats(ajvInstance);
 
-    ajvInstance.addSchema(simpleTypesObject, simpleTypesObject.$id);
-    ajvInstance.addSchema(localizacaoTypesObject, localizacaoTypesObject.$id);
-    ajvInstance.addSchema(institucionalTypesObject, institucionalTypesObject.$id);
+    ajvInstance.addSchema(simpleTypesSchema, simpleTypesSchema.$id);
+    ajvInstance.addSchema(localizacaoTypesSchema, localizacaoTypesSchema.$id);
+    ajvInstance.addSchema(institucionalTypesSchema, institucionalTypesSchema.$id);
   });
 
   describe('InstituicaoType validations', () => {
@@ -63,20 +50,11 @@ describe('Institucional Types JSON Schema v1.0', () => {
       ]);
     });
 
-    it('should return invalid when additional properties are present', () => {
-      const invalidInput = {
-        Nome: 'Instituto Teste',
-        CNPJ: '12345678000195',
-        Endereco: {
-          Logradouro: 'Rua A',
-          Numero: '1',
-          Bairro: 'Centro',
-          Cidade: 'Cidade',
-          UF: 'PB',
-          CEP: '58051380',
-        },
-        ExtraProperty: 'not-allowed',
-      };
+    it('should return invalid when additional properties are present', async () => {
+      const invalidInput = await loadFixture(
+        'v1.0/schemas/institucional-types/valid-required-instituicao-type.json',
+        { ExtraProperty: 'not-allowed' },
+      );
 
       const typeValidator = ajvInstance.getSchema(instituicaoTypeRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -88,19 +66,10 @@ describe('Institucional Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return valid when only required properties are provided', () => {
-      const validInput = {
-        Nome: 'Instituto Teste',
-        CNPJ: '12345678000195',
-        Endereco: {
-          Logradouro: 'Rua A',
-          Numero: '1',
-          Bairro: 'Centro',
-          Cidade: 'Cidade',
-          UF: 'PB',
-          CEP: '58051380',
-        },
-      };
+    it('should return valid when only required properties are provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/institucional-types/valid-required-instituicao-type.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(instituicaoTypeRef)!;
       const validationResult = typeValidator(validInput);
@@ -108,23 +77,10 @@ describe('Institucional Types JSON Schema v1.0', () => {
       expect(validationResult).toBe(true);
     });
 
-    it('should return valid when optional properties are provided', () => {
-      const validInput = {
-        Nome: 'Instituto Teste',
-        CNPJ: '12345678000195',
-        Unidade: 'Unidade Teste',
-        Endereco: {
-          Logradouro: 'Rua A',
-          Numero: '1',
-          Bairro: 'Centro',
-          Cidade: 'Cidade',
-          UF: 'PB',
-          CEP: '58051380',
-        },
-        Contato: {
-          Telefone: '999562160',
-        },
-      };
+    it('should return valid when optional properties are provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/institucional-types/valid-optional-instituicao-type.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(instituicaoTypeRef)!;
       const validationResult = typeValidator(validInput);

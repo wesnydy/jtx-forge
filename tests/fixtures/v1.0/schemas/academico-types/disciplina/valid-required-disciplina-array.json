@@ -1,0 +1,22 @@
+[
+  {
+    "Disciplina": {
+      "Nome": "Disciplina A",
+      "Codigo": "1",
+      "Creditos": "1",
+      "CargaHoraria": "1",
+      "Situacao": "Aprovado",
+      "Nota": "10.00"
+    }
+  },
+  {
+    "Disciplina": {
+      "Nome": "Disciplina B",
+      "Codigo": "2",
+      "Creditos": "1",
+      "CargaHoraria": "1",
+      "Situacao": "Aprovado",
+      "Nota": "10.00"
+    }
+  }
+]

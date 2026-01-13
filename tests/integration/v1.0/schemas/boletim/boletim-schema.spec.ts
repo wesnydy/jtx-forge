@@ -5,87 +5,48 @@ import path from 'node:path';
 
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
+
 import JSONSchemaURIs from '@/versions/v1.0/utils/json-schema-uris';
+import loadFixture from '@tests/utils/load-fixture';
 
 describe('Boletim JSON Schema v1.0', () => {
   let ajvInstance: Ajv;
 
   beforeAll(async () => {
-    const boletimString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/boletim/boletim.schema.json',
-      ),
-      'utf-8',
-    );
-    const boletimObject = JSON.parse(boletimString);
+    const schemasPath = path.resolve(__dirname, '../../../../../lib/versions/v1.0/schemas/json');
 
-    const boletimTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/boletim/boletim-types.schema.json',
-      ),
-      'utf-8',
-    );
-    const boletimTypesObject = JSON.parse(boletimTypesString);
+    const schemasFiles = await Promise.all([
+      fs.readFile(path.join(schemasPath, 'boletim/boletim.schema.json'), 'utf-8'),
+      fs.readFile(path.join(schemasPath, 'boletim/boletim-types.schema.json'), 'utf-8'),
+      fs.readFile(path.join(schemasPath, 'shared/academico-types.schema.json'), 'utf-8'),
+      fs.readFile(path.join(schemasPath, 'shared/institucional-types.schema.json'), 'utf-8'),
+      fs.readFile(path.join(schemasPath, 'shared/localizacao-types.schema.json'), 'utf-8'),
+      fs.readFile(path.join(schemasPath, 'shared/pessoal-types.schema.json'), 'utf-8'),
+      fs.readFile(path.join(schemasPath, 'shared/simple-types.schema.json'), 'utf-8'),
+    ]);
 
-    const academicoTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/shared/academico-types.schema.json',
-      ),
-      'utf-8',
-    );
-    const academicoTypesObject = JSON.parse(academicoTypesString);
-
-    const institucionalTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/shared/institucional-types.schema.json',
-      ),
-      'utf-8',
-    );
-    const institucionalTypesObject = JSON.parse(institucionalTypesString);
-
-    const localizacaoTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/shared/localizacao-types.schema.json',
-      ),
-      'utf-8',
-    );
-    const localizacaoTypesObject = JSON.parse(localizacaoTypesString);
-
-    const pessoalTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/shared/pessoal-types.schema.json',
-      ),
-      'utf-8',
-    );
-    const pessoalTypesObject = JSON.parse(pessoalTypesString);
-
-    const simpleTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/shared/simple-types.schema.json',
-      ),
-      'utf-8',
-    );
-    const simpleTypesObject = JSON.parse(simpleTypesString);
+    const [
+      boletimSchema,
+      boletimTypesSchema,
+      academicoTypesSchema,
+      institucionalTypesSchema,
+      localizacaoTypesSchema,
+      pessoalTypesSchema,
+      simpleTypesSchema,
+    ] = schemasFiles.map((file) => JSON.parse(file));
 
     ajvInstance = new Ajv({ allErrors: true, strict: false });
     addFormats(ajvInstance);
 
-    ajvInstance.addSchema(simpleTypesObject, simpleTypesObject.$id);
-    ajvInstance.addSchema(pessoalTypesObject, pessoalTypesObject.$id);
-    ajvInstance.addSchema(localizacaoTypesObject, localizacaoTypesObject.$id);
-    ajvInstance.addSchema(institucionalTypesObject, institucionalTypesObject.$id);
-    ajvInstance.addSchema(academicoTypesObject, academicoTypesObject.$id);
-    ajvInstance.addSchema(boletimTypesObject, boletimTypesObject.$id);
-    ajvInstance.addSchema(boletimObject, boletimObject.$id);
+    ajvInstance.addSchema(simpleTypesSchema, simpleTypesSchema.$id);
+    ajvInstance.addSchema(pessoalTypesSchema, pessoalTypesSchema.$id);
+    ajvInstance.addSchema(localizacaoTypesSchema, localizacaoTypesSchema.$id);
+    ajvInstance.addSchema(institucionalTypesSchema, institucionalTypesSchema.$id);
+    ajvInstance.addSchema(academicoTypesSchema, academicoTypesSchema.$id);
+    ajvInstance.addSchema(boletimTypesSchema, boletimTypesSchema.$id);
+    ajvInstance.addSchema(boletimSchema, boletimSchema.$id);
 
-    ajvInstance.compile(boletimObject);
+    ajvInstance.compile(boletimSchema);
   });
 
   describe('Boletim root validations', () => {
@@ -104,63 +65,10 @@ describe('Boletim JSON Schema v1.0', () => {
       });
     });
 
-    it('should return invalid when additional properties are present', () => {
-      const invalidInput = {
-        Boletim: {
-          Versao: '1.0',
-          Cabecalho: {
-            Instituicao: {
-              Nome: 'Instituto Teste',
-              CNPJ: '12345678000195',
-              Endereco: {
-                Logradouro: 'Rua A',
-                Numero: '1',
-                Bairro: 'Centro',
-                Cidade: 'Cidade',
-                UF: 'PB',
-                CEP: '58051380',
-              },
-            },
-            IdentificadorDocumento: 'doc-1',
-            DataEmissao: '2020-01-01',
-          },
-          Estudante: {
-            ID: 'est-1',
-            Nome: 'Aluno Teste',
-            CPF: '20122242756',
-          },
-          Curso: {
-            Nome: 'Curso Teste',
-            Codigo: '1',
-          },
-          Periodos: [
-            {
-              Periodo: {
-                Codigo: 'P1',
-                Inicio: '2020-01-01',
-                Fim: '2020-06-01',
-                Disciplinas: [
-                  {
-                    Disciplina: {
-                      Nome: 'Disciplina A',
-                      Codigo: '1',
-                      Creditos: '1',
-                      CargaHoraria: '1',
-                      Situacao: 'Aprovado',
-                      Nota: '10.00',
-                    },
-                  },
-                ],
-              },
-            },
-          ],
-          ResumoAcademico: {
-            CRA: '0.00',
-            TotalCreditosConcluidos: '0.00',
-          },
-        },
+    it('should return invalid when additional properties are present', async () => {
+      const invalidInput = await loadFixture('v1.0/schemas/boletim/valid-required-boletim.json', {
         ExtraProperty: 'not-allowed',
-      };
+      });
 
       const typeValidator = ajvInstance.getSchema(boletimRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -172,62 +80,8 @@ describe('Boletim JSON Schema v1.0', () => {
       });
     });
 
-    it('should return valid when a minimal valid boletim is provided', () => {
-      const validInput = {
-        Boletim: {
-          Versao: '1.0',
-          Cabecalho: {
-            Instituicao: {
-              Nome: 'Instituto Teste',
-              CNPJ: '12345678000195',
-              Endereco: {
-                Logradouro: 'Rua A',
-                Numero: '1',
-                Bairro: 'Centro',
-                Cidade: 'Cidade',
-                UF: 'PB',
-                CEP: '58051380',
-              },
-            },
-            IdentificadorDocumento: 'doc-1',
-            DataEmissao: '2020-01-01',
-          },
-          Estudante: {
-            ID: 'est-1',
-            Nome: 'Aluno Teste',
-            CPF: '20122242756',
-          },
-          Curso: {
-            Nome: 'Curso Teste',
-            Codigo: '1',
-          },
-          Periodos: [
-            {
-              Periodo: {
-                Codigo: 'P1',
-                Inicio: '2020-01-01',
-                Fim: '2020-06-01',
-                Disciplinas: [
-                  {
-                    Disciplina: {
-                      Nome: 'Disciplina A',
-                      Codigo: '1',
-                      Creditos: '1',
-                      CargaHoraria: '1',
-                      Situacao: 'Aprovado',
-                      Nota: '10.00',
-                    },
-                  },
-                ],
-              },
-            },
-          ],
-          ResumoAcademico: {
-            CRA: '0.00',
-            TotalCreditosConcluidos: '0.00',
-          },
-        },
-      };
+    it('should return valid when a minimal valid boletim is provided', async () => {
+      const validInput = await loadFixture('v1.0/schemas/boletim/valid-required-boletim.json');
 
       const typeValidator = ajvInstance.getSchema(boletimRef)!;
       const validationResult = typeValidator(validInput);
@@ -265,65 +119,11 @@ describe('Boletim JSON Schema v1.0', () => {
       });
     });
 
-    it('should return invalid when root has an item with additional properties', () => {
-      const invalidInput = [
-        {
-          Boletim: {
-            Versao: '1.0',
-            Cabecalho: {
-              Instituicao: {
-                Nome: 'Instituto Teste',
-                CNPJ: '12345678000195',
-                Endereco: {
-                  Logradouro: 'Rua A',
-                  Numero: '1',
-                  Bairro: 'Centro',
-                  Cidade: 'Cidade',
-                  UF: 'PB',
-                  CEP: '58051380',
-                },
-              },
-              IdentificadorDocumento: 'doc-1',
-              DataEmissao: '2020-01-01',
-            },
-            Estudante: {
-              ID: 'est-1',
-              Nome: 'Aluno Teste',
-              CPF: '20122242756',
-            },
-            Curso: {
-              Nome: 'Curso Teste',
-              Codigo: '1',
-            },
-            Periodos: [
-              {
-                Periodo: {
-                  Codigo: 'P1',
-                  Inicio: '2020-01-01',
-                  Fim: '2020-06-01',
-                  Disciplinas: [
-                    {
-                      Disciplina: {
-                        Nome: 'Disciplina A',
-                        Codigo: '1',
-                        Creditos: '1',
-                        CargaHoraria: '1',
-                        Situacao: 'Aprovado',
-                        Nota: '10.00',
-                      },
-                    },
-                  ],
-                },
-              },
-            ],
-            ResumoAcademico: {
-              CRA: '0.00',
-              TotalCreditosConcluidos: '0.00',
-            },
-          },
-          ExtraProperty: 'not-allowed',
-        },
-      ];
+    it('should return invalid when root has an item with additional properties', async () => {
+      const invalidItem = await loadFixture('v1.0/schemas/boletim/valid-required-boletim.json', {
+        ExtraProperty: 'not-allowed',
+      });
+      const invalidInput = [invalidItem];
 
       const typeValidator = ajvInstance.getSchema(loteBoletimRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -335,119 +135,9 @@ describe('Boletim JSON Schema v1.0', () => {
       });
     });
 
-    it('should return invalid when root contains duplicated items', () => {
-      const invalidInput = [
-        {
-          Boletim: {
-            Versao: '1.0',
-            Cabecalho: {
-              Instituicao: {
-                Nome: 'Instituto Teste',
-                CNPJ: '12345678000195',
-                Endereco: {
-                  Logradouro: 'Rua A',
-                  Numero: '1',
-                  Bairro: 'Centro',
-                  Cidade: 'Cidade',
-                  UF: 'PB',
-                  CEP: '58051380',
-                },
-              },
-              IdentificadorDocumento: 'doc-1',
-              DataEmissao: '2020-01-01',
-            },
-            Estudante: {
-              ID: 'est-1',
-              Nome: 'Aluno Teste',
-              CPF: '20122242756',
-            },
-            Curso: {
-              Nome: 'Curso Teste',
-              Codigo: '1',
-            },
-            Periodos: [
-              {
-                Periodo: {
-                  Codigo: 'P1',
-                  Inicio: '2020-01-01',
-                  Fim: '2020-06-01',
-                  Disciplinas: [
-                    {
-                      Disciplina: {
-                        Nome: 'Disciplina A',
-                        Codigo: '1',
-                        Creditos: '1',
-                        CargaHoraria: '1',
-                        Situacao: 'Aprovado',
-                        Nota: '10.00',
-                      },
-                    },
-                  ],
-                },
-              },
-            ],
-            ResumoAcademico: {
-              CRA: '0.00',
-              TotalCreditosConcluidos: '0.00',
-            },
-          },
-        },
-        {
-          Boletim: {
-            Versao: '1.0',
-            Cabecalho: {
-              Instituicao: {
-                Nome: 'Instituto Teste',
-                CNPJ: '12345678000195',
-                Endereco: {
-                  Logradouro: 'Rua A',
-                  Numero: '1',
-                  Bairro: 'Centro',
-                  Cidade: 'Cidade',
-                  UF: 'PB',
-                  CEP: '58051380',
-                },
-              },
-              IdentificadorDocumento: 'doc-1',
-              DataEmissao: '2020-01-01',
-            },
-            Estudante: {
-              ID: 'est-1',
-              Nome: 'Aluno Teste',
-              CPF: '20122242756',
-            },
-            Curso: {
-              Nome: 'Curso Teste',
-              Codigo: '1',
-            },
-            Periodos: [
-              {
-                Periodo: {
-                  Codigo: 'P1',
-                  Inicio: '2020-01-01',
-                  Fim: '2020-06-01',
-                  Disciplinas: [
-                    {
-                      Disciplina: {
-                        Nome: 'Disciplina A',
-                        Codigo: '1',
-                        Creditos: '1',
-                        CargaHoraria: '1',
-                        Situacao: 'Aprovado',
-                        Nota: '10.00',
-                      },
-                    },
-                  ],
-                },
-              },
-            ],
-            ResumoAcademico: {
-              CRA: '0.00',
-              TotalCreditosConcluidos: '0.00',
-            },
-          },
-        },
-      ];
+    it('should return invalid when root contains duplicated items', async () => {
+      const validItem = await loadFixture('v1.0/schemas/boletim/valid-required-boletim.json');
+      const invalidInput = [validItem, validItem];
 
       const typeValidator = ajvInstance.getSchema(loteBoletimRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -459,119 +149,10 @@ describe('Boletim JSON Schema v1.0', () => {
       });
     });
 
-    it('should return valid when multiple valid boletim items are provided', () => {
-      const validInput = [
-        {
-          Boletim: {
-            Versao: '1.0',
-            Cabecalho: {
-              Instituicao: {
-                Nome: 'Instituto Teste',
-                CNPJ: '12345678000195',
-                Endereco: {
-                  Logradouro: 'Rua A',
-                  Numero: '1',
-                  Bairro: 'Centro',
-                  Cidade: 'Cidade',
-                  UF: 'PB',
-                  CEP: '58051380',
-                },
-              },
-              IdentificadorDocumento: 'doc-1',
-              DataEmissao: '2020-01-01',
-            },
-            Estudante: {
-              ID: 'est-1',
-              Nome: 'Aluno Teste',
-              CPF: '20122242756',
-            },
-            Curso: {
-              Nome: 'Curso Teste',
-              Codigo: '1',
-            },
-            Periodos: [
-              {
-                Periodo: {
-                  Codigo: 'P1',
-                  Inicio: '2020-01-01',
-                  Fim: '2020-06-01',
-                  Disciplinas: [
-                    {
-                      Disciplina: {
-                        Nome: 'Disciplina A',
-                        Codigo: '1',
-                        Creditos: '1',
-                        CargaHoraria: '1',
-                        Situacao: 'Aprovado',
-                        Nota: '10.00',
-                      },
-                    },
-                  ],
-                },
-              },
-            ],
-            ResumoAcademico: {
-              CRA: '0.00',
-              TotalCreditosConcluidos: '0.00',
-            },
-          },
-        },
-        {
-          Boletim: {
-            Versao: '1.0',
-            Cabecalho: {
-              Instituicao: {
-                Nome: 'Instituto Teste',
-                CNPJ: '12345678000195',
-                Endereco: {
-                  Logradouro: 'Rua A',
-                  Numero: '1',
-                  Bairro: 'Centro',
-                  Cidade: 'Cidade',
-                  UF: 'PB',
-                  CEP: '58051380',
-                },
-              },
-              IdentificadorDocumento: 'doc-2',
-              DataEmissao: '2020-01-01',
-            },
-            Estudante: {
-              ID: 'est-2',
-              Nome: 'Aluno Teste',
-              CPF: '20122242756',
-            },
-            Curso: {
-              Nome: 'Curso Teste',
-              Codigo: '2',
-            },
-            Periodos: [
-              {
-                Periodo: {
-                  Codigo: 'P2',
-                  Inicio: '2020-01-01',
-                  Fim: '2020-06-01',
-                  Disciplinas: [
-                    {
-                      Disciplina: {
-                        Nome: 'Disciplina B',
-                        Codigo: '1',
-                        Creditos: '1',
-                        CargaHoraria: '1',
-                        Situacao: 'Aprovado',
-                        Nota: '10.00',
-                      },
-                    },
-                  ],
-                },
-              },
-            ],
-            ResumoAcademico: {
-              CRA: '0.00',
-              TotalCreditosConcluidos: '0.00',
-            },
-          },
-        },
-      ];
+    it('should return valid when multiple valid boletim items are provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/boletim/valid-required-boletim-array.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(loteBoletimRef)!;
       const validationResult = typeValidator(validInput);
@@ -600,61 +181,11 @@ describe('Boletim JSON Schema v1.0', () => {
       ]);
     });
 
-    it('should return invalid when additional properties are present', () => {
-      const invalidInput = {
-        Versao: '1.0',
-        Cabecalho: {
-          Instituicao: {
-            Nome: 'Instituto Teste',
-            CNPJ: '12345678000195',
-            Endereco: {
-              Logradouro: 'Rua A',
-              Numero: '1',
-              Bairro: 'Centro',
-              Cidade: 'Cidade',
-              UF: 'PB',
-              CEP: '58051380',
-            },
-          },
-          IdentificadorDocumento: 'doc-1',
-          DataEmissao: '2020-01-01',
-        },
-        Estudante: {
-          ID: 'est-1',
-          Nome: 'Aluno Teste',
-          CPF: '20122242756',
-        },
-        Curso: {
-          Nome: 'Curso Teste',
-          Codigo: '1',
-        },
-        Periodos: [
-          {
-            Periodo: {
-              Codigo: 'P1',
-              Inicio: '2020-01-01',
-              Fim: '2020-06-01',
-              Disciplinas: [
-                {
-                  Disciplina: {
-                    Nome: 'Disciplina A',
-                    Codigo: '1',
-                    Creditos: '1',
-                    CargaHoraria: '1',
-                    Situacao: 'Aprovado',
-                    Nota: '10.00',
-                  },
-                },
-              ],
-            },
-          },
-        ],
-        ResumoAcademico: {
-          CRA: '0.00',
-          TotalCreditosConcluidos: '0.00',
-        },
-        ExtraProperty: 'not-allowed',
-      };
+    it('should return invalid when additional properties are present', async () => {
+      const invalidInput = await loadFixture(
+        'v1.0/schemas/boletim/valid-required-boletim-type.json',
+        { ExtraProperty: 'not-allowed' },
+      );
 
       const typeValidator = ajvInstance.getSchema(boletimTypeRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -666,60 +197,11 @@ describe('Boletim JSON Schema v1.0', () => {
       });
     });
 
-    it('should return invalid when "Versao" property is not "1.0"', () => {
-      const invalidInput = {
-        Versao: '0.0',
-        Cabecalho: {
-          Instituicao: {
-            Nome: 'Instituto Teste',
-            CNPJ: '12345678000195',
-            Endereco: {
-              Logradouro: 'Rua A',
-              Numero: '1',
-              Bairro: 'Centro',
-              Cidade: 'Cidade',
-              UF: 'PB',
-              CEP: '58051380',
-            },
-          },
-          IdentificadorDocumento: 'doc-1',
-          DataEmissao: '2020-01-01',
-        },
-        Estudante: {
-          ID: 'est-1',
-          Nome: 'Aluno Teste',
-          CPF: '20122242756',
-        },
-        Curso: {
-          Nome: 'Curso Teste',
-          Codigo: '1',
-        },
-        Periodos: [
-          {
-            Periodo: {
-              Codigo: 'P1',
-              Inicio: '2020-01-01',
-              Fim: '2020-06-01',
-              Disciplinas: [
-                {
-                  Disciplina: {
-                    Nome: 'Disciplina A',
-                    Codigo: '1',
-                    Creditos: '1',
-                    CargaHoraria: '1',
-                    Situacao: 'Aprovado',
-                    Nota: '10.00',
-                  },
-                },
-              ],
-            },
-          },
-        ],
-        ResumoAcademico: {
-          CRA: '0.00',
-          TotalCreditosConcluidos: '0.00',
-        },
-      };
+    it('should return invalid when "Versao" property is not "1.0"', async () => {
+      const invalidInput = await loadFixture(
+        'v1.0/schemas/boletim/valid-required-boletim-type.json',
+        { Versao: '0.0' },
+      );
 
       const typeValidator = ajvInstance.getSchema(boletimTypeRef)!;
       const validationResult = typeValidator(invalidInput as unknown);
@@ -731,60 +213,8 @@ describe('Boletim JSON Schema v1.0', () => {
       });
     });
 
-    it('should return valid when only required properties are provided', () => {
-      const validInput = {
-        Versao: '1.0',
-        Cabecalho: {
-          Instituicao: {
-            Nome: 'Instituto Teste',
-            CNPJ: '12345678000195',
-            Endereco: {
-              Logradouro: 'Rua A',
-              Numero: '1',
-              Bairro: 'Centro',
-              Cidade: 'Cidade',
-              UF: 'PB',
-              CEP: '58051380',
-            },
-          },
-          IdentificadorDocumento: 'doc-1',
-          DataEmissao: '2020-01-01',
-        },
-        Estudante: {
-          ID: 'est-1',
-          Nome: 'Aluno Teste',
-          CPF: '20122242756',
-        },
-        Curso: {
-          Nome: 'Curso Teste',
-          Codigo: '1',
-        },
-        Periodos: [
-          {
-            Periodo: {
-              Codigo: 'P1',
-              Inicio: '2020-01-01',
-              Fim: '2020-06-01',
-              Disciplinas: [
-                {
-                  Disciplina: {
-                    Nome: 'Disciplina A',
-                    Codigo: '1',
-                    Creditos: '1',
-                    CargaHoraria: '1',
-                    Situacao: 'Aprovado',
-                    Nota: '10.00',
-                  },
-                },
-              ],
-            },
-          },
-        ],
-        ResumoAcademico: {
-          CRA: '0.00',
-          TotalCreditosConcluidos: '0.00',
-        },
-      };
+    it('should return valid when only required properties are provided', async () => {
+      const validInput = await loadFixture('v1.0/schemas/boletim/valid-required-boletim-type.json');
 
       const typeValidator = ajvInstance.getSchema(boletimTypeRef)!;
       const validationResult = typeValidator(validInput);
@@ -792,70 +222,8 @@ describe('Boletim JSON Schema v1.0', () => {
       expect(validationResult).toBe(true);
     });
 
-    it('should return valid when optional property "Assinaturas" is provided', () => {
-      const validInput = {
-        Versao: '1.0',
-        Cabecalho: {
-          Instituicao: {
-            Nome: 'Instituto Teste',
-            CNPJ: '12345678000195',
-            Endereco: {
-              Logradouro: 'Rua A',
-              Numero: '1',
-              Bairro: 'Centro',
-              Cidade: 'Cidade',
-              UF: 'PB',
-              CEP: '58051380',
-            },
-          },
-          IdentificadorDocumento: 'doc-1',
-          DataEmissao: '2020-01-01',
-        },
-        Estudante: {
-          ID: 'est-1',
-          Nome: 'Aluno Teste',
-          CPF: '20122242756',
-        },
-        Curso: {
-          Nome: 'Curso Teste',
-          Codigo: '1',
-        },
-        Periodos: [
-          {
-            Periodo: {
-              Codigo: 'P1',
-              Inicio: '2020-01-01',
-              Fim: '2020-06-01',
-              Disciplinas: [
-                {
-                  Disciplina: {
-                    Nome: 'Disciplina A',
-                    Codigo: '1',
-                    Creditos: '1',
-                    CargaHoraria: '1',
-                    Situacao: 'Aprovado',
-                    Nota: '10.00',
-                  },
-                },
-              ],
-            },
-          },
-        ],
-        ResumoAcademico: {
-          CRA: '0.00',
-          TotalCreditosConcluidos: '0.00',
-        },
-        Assinaturas: [
-          {
-            Assinatura: {
-              NomeAssinador: 'Assinatura Teste',
-              Cargo: 'Assinante',
-              Data: '2020-01-01',
-              AssinaturaDigital: 'abcdef1234567890',
-            },
-          },
-        ],
-      };
+    it('should return valid when optional property "Assinaturas" is provided', async () => {
+      const validInput = await loadFixture('v1.0/schemas/boletim/valid-optional-boletim-type.json');
 
       const typeValidator = ajvInstance.getSchema(boletimTypeRef)!;
       const validationResult = typeValidator(validInput);

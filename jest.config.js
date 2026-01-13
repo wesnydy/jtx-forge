@@ -12,6 +12,7 @@ module.exports = {
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/lib/$1',
+    '^@tests/(.*)$': '<rootDir>/tests/$1',
   },
   collectCoverageFrom: ['lib/**/*.ts'],
   coverageDirectory: 'coverage',

@@ -5,35 +5,28 @@ import path from 'node:path';
 
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
+
 import JSONSchemaURIs from '@/versions/v1.0/utils/json-schema-uris';
+import loadFixture from '@tests/utils/load-fixture';
 
 describe('Pessoal Types JSON Schema v1.0', () => {
   let ajvInstance: Ajv;
 
   beforeAll(async () => {
-    const simpleTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/shared/simple-types.schema.json',
-      ),
-      'utf-8',
-    );
-    const simpleTypesObject = JSON.parse(simpleTypesString);
+    const schemasPath = path.resolve(__dirname, '../../../../../lib/versions/v1.0/schemas/json');
 
-    const pessoalTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/shared/pessoal-types.schema.json',
-      ),
-      'utf-8',
-    );
-    const pessoalTypesObject = JSON.parse(pessoalTypesString);
+    const schemasFiles = await Promise.all([
+      fs.readFile(path.join(schemasPath, 'shared/pessoal-types.schema.json'), 'utf-8'),
+      fs.readFile(path.join(schemasPath, 'shared/simple-types.schema.json'), 'utf-8'),
+    ]);
+
+    const [pessoalTypesSchema, simpleTypesSchema] = schemasFiles.map((file) => JSON.parse(file));
 
     ajvInstance = new Ajv({ allErrors: true, strict: false });
     addFormats(ajvInstance);
 
-    ajvInstance.addSchema(simpleTypesObject, simpleTypesObject.$id);
-    ajvInstance.addSchema(pessoalTypesObject, pessoalTypesObject.$id);
+    ajvInstance.addSchema(simpleTypesSchema, simpleTypesSchema.$id);
+    ajvInstance.addSchema(pessoalTypesSchema, pessoalTypesSchema.$id);
   });
 
   describe('PessoalType validations', () => {
@@ -53,13 +46,11 @@ describe('Pessoal Types JSON Schema v1.0', () => {
       ]);
     });
 
-    it('should return invalid when additional properties are present', () => {
-      const invalidInput = {
-        ID: 'est-1',
-        Nome: 'Aluno Teste',
-        CPF: '20122242756',
-        ExtraProperty: 'not-allowed',
-      };
+    it('should return invalid when additional properties are present', async () => {
+      const invalidInput = await loadFixture(
+        'v1.0/schemas/pessoal-types/valid-required-pessoal-type.json',
+        { ExtraProperty: 'not-allowed' },
+      );
 
       const typeValidator = ajvInstance.getSchema(pessoalTypeRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -71,12 +62,10 @@ describe('Pessoal Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return valid when all required properties are provided', () => {
-      const validInput = {
-        ID: 'est-1',
-        Nome: 'Aluno Teste',
-        CPF: '20122242756',
-      };
+    it('should return valid when all required properties are provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/pessoal-types/valid-required-pessoal-type.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(pessoalTypeRef)!;
       const validationResult = typeValidator(validInput);

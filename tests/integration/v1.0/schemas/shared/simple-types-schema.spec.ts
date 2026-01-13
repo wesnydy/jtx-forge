@@ -10,16 +10,17 @@ describe('Simple Types JSON Schema v1.0', () => {
   let ajvInstance: Ajv;
 
   beforeAll(async () => {
-    const schemaString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/shared/simple-types.schema.json',
-      ),
+    const schemasPath = path.resolve(__dirname, '../../../../../lib/versions/v1.0/schemas/json');
+
+    const schemaFile = await fs.readFile(
+      path.join(schemasPath, 'shared/simple-types.schema.json'),
       'utf-8',
     );
-    const schemaObject = JSON.parse(schemaString);
+
+    const simpleTypesSchema = JSON.parse(schemaFile);
+
     ajvInstance = new Ajv({ allErrors: true, strict: false });
-    ajvInstance.compile(schemaObject);
+    ajvInstance.compile(simpleTypesSchema);
   });
 
   describe('StringType Validations', () => {

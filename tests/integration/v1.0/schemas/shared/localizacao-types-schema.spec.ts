@@ -5,35 +5,30 @@ import path from 'node:path';
 
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
+
 import JSONSchemaURIs from '@/versions/v1.0/utils/json-schema-uris';
+import loadFixture from '@tests/utils/load-fixture';
 
 describe('Localização Types JSON Schema v1.0', () => {
   let ajvInstance: Ajv;
 
   beforeAll(async () => {
-    const simpleTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/shared/simple-types.schema.json',
-      ),
-      'utf-8',
-    );
-    const simpleTypesObject = JSON.parse(simpleTypesString);
+    const schemasPath = path.resolve(__dirname, '../../../../../lib/versions/v1.0/schemas/json');
 
-    const localizacaoTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/shared/localizacao-types.schema.json',
-      ),
-      'utf-8',
+    const schemasFiles = await Promise.all([
+      fs.readFile(path.join(schemasPath, 'shared/localizacao-types.schema.json'), 'utf-8'),
+      fs.readFile(path.join(schemasPath, 'shared/simple-types.schema.json'), 'utf-8'),
+    ]);
+
+    const [localizacaoTypesSchema, simpleTypesSchema] = schemasFiles.map((file) =>
+      JSON.parse(file),
     );
-    const localizacaoTypesObject = JSON.parse(localizacaoTypesString);
 
     ajvInstance = new Ajv({ allErrors: true, strict: false });
     addFormats(ajvInstance);
 
-    ajvInstance.addSchema(simpleTypesObject, simpleTypesObject.$id);
-    ajvInstance.addSchema(localizacaoTypesObject, localizacaoTypesObject.$id);
+    ajvInstance.addSchema(simpleTypesSchema, simpleTypesSchema.$id);
+    ajvInstance.addSchema(localizacaoTypesSchema, localizacaoTypesSchema.$id);
   });
 
   describe('EnderecoType validations', () => {
@@ -56,16 +51,11 @@ describe('Localização Types JSON Schema v1.0', () => {
       ]);
     });
 
-    it('should return invalid when additional properties are present', () => {
-      const invalidInput = {
-        Logradouro: 'Rua A',
-        Numero: '1',
-        Bairro: 'Centro',
-        Cidade: 'Cidade',
-        UF: 'PB',
-        CEP: '58051380',
-        ExtraProperty: 'not-allowed',
-      };
+    it('should return invalid when additional properties are present', async () => {
+      const invalidInput = await loadFixture(
+        'v1.0/schemas/localizacao-types/endereco/valid-required-endereco-type.json',
+        { ExtraProperty: 'not-allowed' },
+      );
 
       const typeValidator = ajvInstance.getSchema(enderecoTypeRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -77,15 +67,10 @@ describe('Localização Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return valid when only required properties are provided', () => {
-      const validInput = {
-        Logradouro: 'Rua A',
-        Numero: '1',
-        Bairro: 'Centro',
-        Cidade: 'Cidade',
-        UF: 'PB',
-        CEP: '58051380',
-      };
+    it('should return valid when only required properties are provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/localizacao-types/endereco/valid-required-endereco-type.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(enderecoTypeRef)!;
       const validationResult = typeValidator(validInput);
@@ -93,16 +78,10 @@ describe('Localização Types JSON Schema v1.0', () => {
       expect(validationResult).toBe(true);
     });
 
-    it('should return valid when optional property "Complemento" is provided', () => {
-      const validInput = {
-        Logradouro: 'Rua A',
-        Numero: '1',
-        Complemento: 'Bloco A, Apartamento 501',
-        Bairro: 'Centro',
-        Cidade: 'Cidade',
-        UF: 'PB',
-        CEP: '58051380',
-      };
+    it('should return valid when optional property "Complemento" is provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/localizacao-types/endereco/valid-optional-endereco-type.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(enderecoTypeRef)!;
       const validationResult = typeValidator(validInput);
@@ -126,11 +105,11 @@ describe('Localização Types JSON Schema v1.0', () => {
       ]);
     });
 
-    it('should return invalid when additional properties are present', () => {
-      const invalidInput = {
-        Telefone: '999562160',
-        ExtraProperty: 'not-allowed',
-      };
+    it('should return invalid when additional properties are present', async () => {
+      const invalidInput = await loadFixture(
+        'v1.0/schemas/localizacao-types/contato/valid-required-contato-type.json',
+        { ExtraProperty: 'not-allowed' },
+      );
 
       const typeValidator = ajvInstance.getSchema(contatoTypeRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -142,10 +121,10 @@ describe('Localização Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return valid when only required properties are provided', () => {
-      const validInput = {
-        Telefone: '999562160',
-      };
+    it('should return valid when only required properties are provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/localizacao-types/contato/valid-required-contato-type.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(contatoTypeRef)!;
       const validationResult = typeValidator(validInput);
@@ -153,11 +132,10 @@ describe('Localização Types JSON Schema v1.0', () => {
       expect(validationResult).toBe(true);
     });
 
-    it('should return valid when optional property "Email" is provided', () => {
-      const validInput = {
-        Telefone: '999562160',
-        Email: 'contato@exemplo.com',
-      };
+    it('should return valid when optional property "Email" is provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/localizacao-types/contato/valid-optional-contato-type.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(contatoTypeRef)!;
       const validationResult = typeValidator(validInput);

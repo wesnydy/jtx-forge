@@ -1,0 +1,10 @@
+{
+  "Nome": "Disciplina A",
+  "Codigo": "1",
+  "Creditos": "1",
+  "CargaHoraria": "1",
+  "Frequencia": "100",
+  "Situacao": "Aprovado",
+  "Nota": "10.00",
+  "Comentarios": "Estudante em bom desempenho"
+}

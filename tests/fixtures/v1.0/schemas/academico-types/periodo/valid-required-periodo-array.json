@@ -1,0 +1,40 @@
+[
+  {
+    "Periodo": {
+      "Codigo": "2021.1",
+      "Inicio": "2021-01-01",
+      "Fim": "2021-06-30",
+      "Disciplinas": [
+        {
+          "Disciplina": {
+            "Nome": "Disciplina A",
+            "Codigo": "1",
+            "Creditos": "1",
+            "CargaHoraria": "1",
+            "Situacao": "Aprovado",
+            "Nota": "10.00"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "Periodo": {
+      "Codigo": "2021.2",
+      "Inicio": "2021-07-01",
+      "Fim": "2021-12-30",
+      "Disciplinas": [
+        {
+          "Disciplina": {
+            "Nome": "Disciplina B",
+            "Codigo": "2",
+            "Creditos": "1",
+            "CargaHoraria": "1",
+            "Situacao": "Aprovado",
+            "Nota": "10.00"
+          }
+        }
+      ]
+    }
+  }
+]

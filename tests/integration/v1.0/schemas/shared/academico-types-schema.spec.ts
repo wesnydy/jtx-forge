@@ -5,35 +5,28 @@ import path from 'node:path';
 
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
+
 import JSONSchemaURIs from '@/versions/v1.0/utils/json-schema-uris';
+import loadFixture from '@tests/utils/load-fixture';
 
 describe('Acadêmico Types JSON Schema v1.0', () => {
   let ajvInstance: Ajv;
 
   beforeAll(async () => {
-    const academicoTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/shared/academico-types.schema.json',
-      ),
-      'utf-8',
-    );
-    const academicoTypesObject = JSON.parse(academicoTypesString);
+    const schemasPath = path.resolve(__dirname, '../../../../../lib/versions/v1.0/schemas/json');
 
-    const simpleTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/shared/simple-types.schema.json',
-      ),
-      'utf-8',
-    );
-    const simpleTypesObject = JSON.parse(simpleTypesString);
+    const schemasFiles = await Promise.all([
+      fs.readFile(path.join(schemasPath, 'shared/academico-types.schema.json'), 'utf-8'),
+      fs.readFile(path.join(schemasPath, 'shared/simple-types.schema.json'), 'utf-8'),
+    ]);
+
+    const [academicoTypesSchema, simpleTypesSchema] = schemasFiles.map((file) => JSON.parse(file));
 
     ajvInstance = new Ajv({ allErrors: true, strict: false });
     addFormats(ajvInstance);
 
-    ajvInstance.addSchema(simpleTypesObject, simpleTypesObject.$id);
-    ajvInstance.addSchema(academicoTypesObject, academicoTypesObject.$id);
+    ajvInstance.addSchema(simpleTypesSchema, simpleTypesSchema.$id);
+    ajvInstance.addSchema(academicoTypesSchema, academicoTypesSchema.$id);
   });
 
   describe('CursoType validations', () => {
@@ -52,12 +45,11 @@ describe('Acadêmico Types JSON Schema v1.0', () => {
       ]);
     });
 
-    it('should return invalid when additional properties are present', () => {
-      const invalidInput = {
-        Nome: 'Curso de Teste',
-        Codigo: '1',
-        ExtraProperty: 'not-allowed',
-      };
+    it('should return invalid when additional properties are present', async () => {
+      const invalidInput = await loadFixture(
+        'v1.0/schemas/academico-types/curso/valid-required-curso-type.json',
+        { ExtraProperty: 'not-allowed' },
+      );
 
       const typeValidator = ajvInstance.getSchema(cursoTypeRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -69,11 +61,10 @@ describe('Acadêmico Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return valid when only required properties are provided', () => {
-      const validInput = {
-        Nome: 'Curso de Teste',
-        Codigo: '1',
-      };
+    it('should return valid when only required properties are provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/academico-types/curso/valid-required-curso-type.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(cursoTypeRef)!;
       const validationResult = typeValidator(validInput);
@@ -81,12 +72,10 @@ describe('Acadêmico Types JSON Schema v1.0', () => {
       expect(validationResult).toBe(true);
     });
 
-    it('should return valid when optional property "Nivel" is provided', () => {
-      const validInput = {
-        Nome: 'Curso de Teste',
-        Codigo: '1',
-        Nivel: 'Bacharelado',
-      };
+    it('should return valid when optional property "Nivel" is provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/academico-types/curso/valid-optional-curso-type.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(cursoTypeRef)!;
       const validationResult = typeValidator(validInput);
@@ -117,16 +106,11 @@ describe('Acadêmico Types JSON Schema v1.0', () => {
       ]);
     });
 
-    it('should return invalid when additional properties are present', () => {
-      const invalidInput = {
-        Nome: 'Disciplina A',
-        Codigo: '1',
-        Creditos: '1',
-        CargaHoraria: '1',
-        Situacao: 'Aprovado',
-        Nota: '10.00',
-        ExtraProperty: 'not-allowed',
-      };
+    it('should return invalid when additional properties are present', async () => {
+      const invalidInput = await loadFixture(
+        'v1.0/schemas/academico-types/disciplina/valid-required-disciplina-type.json',
+        { ExtraProperty: 'not-allowed' },
+      );
 
       const typeValidator = ajvInstance.getSchema(disciplinaTypeRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -138,19 +122,14 @@ describe('Acadêmico Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return invalid when properties from more than oneOf schema are present', () => {
-      const validInput = {
-        Nome: 'Disciplina A',
-        Codigo: '1',
-        Creditos: '1',
-        CargaHoraria: '1',
-        Situacao: 'Aprovado',
-        Nota: '10.00',
-        NotaEscala: 'A',
-      };
+    it('should return invalid when properties from more than oneOf schema are present', async () => {
+      const invalidInput = await loadFixture(
+        'v1.0/schemas/academico-types/disciplina/valid-required-disciplina-type.json',
+        { Nota: '10.00', NotaEscala: 'A' },
+      );
 
       const typeValidator = ajvInstance.getSchema(disciplinaTypeRef)!;
-      const validationResult = typeValidator(validInput);
+      const validationResult = typeValidator(invalidInput);
 
       expect(validationResult).toBe(false);
       expect(typeValidator.errors?.at(0)).toMatchObject({
@@ -159,15 +138,10 @@ describe('Acadêmico Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return valid when only required properties are provided', () => {
-      const validInput = {
-        Nome: 'Disciplina A',
-        Codigo: '1',
-        Creditos: '1',
-        CargaHoraria: '1',
-        Situacao: 'Aprovado',
-        Nota: '10.00',
-      };
+    it('should return valid when only required properties are provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/academico-types/disciplina/valid-required-disciplina-type.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(disciplinaTypeRef)!;
       const validationResult = typeValidator(validInput);
@@ -175,17 +149,10 @@ describe('Acadêmico Types JSON Schema v1.0', () => {
       expect(validationResult).toBe(true);
     });
 
-    it('should return valid when optional properties are provided', () => {
-      const validInput = {
-        Nome: 'Disciplina A',
-        Codigo: '1',
-        Creditos: '1',
-        CargaHoraria: '1',
-        Frequencia: '100',
-        Situacao: 'Aprovado',
-        Nota: '10.00',
-        Comentarios: 'Estudante em bom desempenho',
-      };
+    it('should return valid when optional properties are provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/academico-types/disciplina/valid-optional-disciplina-type.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(disciplinaTypeRef)!;
       const validationResult = typeValidator(validInput);
@@ -223,20 +190,13 @@ describe('Acadêmico Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return invalid when an array item has additional properties', () => {
-      const invalidInput = [
-        {
-          Disciplina: {
-            Nome: 'Disciplina A',
-            Codigo: '1',
-            Creditos: '1',
-            CargaHoraria: '1',
-            Situacao: 'Aprovado',
-            Nota: '10.00',
-            ExtraProperty: 'not-allowed',
-          },
-        },
-      ];
+    it('should return invalid when an array item has additional properties', async () => {
+      const invalidItem = await loadFixture(
+        'v1.0/schemas/academico-types/disciplina/valid-required-disciplina.json',
+        { ExtraProperty: 'not-allowed' },
+      );
+
+      const invalidInput = [invalidItem];
 
       const typeValidator = ajvInstance.getSchema(disciplinaArrayTypeRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -248,29 +208,12 @@ describe('Acadêmico Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return invalid when the array contains duplicated items', () => {
-      const invalidInput = [
-        {
-          Disciplina: {
-            Nome: 'Disciplina A',
-            Codigo: '1',
-            Creditos: '1',
-            CargaHoraria: '1',
-            Situacao: 'Aprovado',
-            Nota: '10.00',
-          },
-        },
-        {
-          Disciplina: {
-            Nome: 'Disciplina A',
-            Codigo: '1',
-            Creditos: '1',
-            CargaHoraria: '1',
-            Situacao: 'Aprovado',
-            Nota: '10.00',
-          },
-        },
-      ];
+    it('should return invalid when the array contains duplicated items', async () => {
+      const validItem = await loadFixture(
+        'v1.0/schemas/academico-types/disciplina/valid-required-disciplina.json',
+      );
+
+      const invalidInput = [validItem, validItem];
 
       const typeValidator = ajvInstance.getSchema(disciplinaArrayTypeRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -282,29 +225,10 @@ describe('Acadêmico Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return valid when multiple valid array items are provided', () => {
-      const validInput = [
-        {
-          Disciplina: {
-            Nome: 'Disciplina A',
-            Codigo: '1',
-            Creditos: '1',
-            CargaHoraria: '1',
-            Situacao: 'Aprovado',
-            Nota: '10.00',
-          },
-        },
-        {
-          Disciplina: {
-            Nome: 'Disciplina B',
-            Codigo: '2',
-            Creditos: '1',
-            CargaHoraria: '1',
-            Situacao: 'Aprovado',
-            Nota: '10.00',
-          },
-        },
-      ];
+    it('should return valid when multiple valid array items are provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/academico-types/disciplina/valid-required-disciplina-array.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(disciplinaArrayTypeRef)!;
       const validationResult = typeValidator(validInput);
@@ -331,25 +255,11 @@ describe('Acadêmico Types JSON Schema v1.0', () => {
       ]);
     });
 
-    it('should return invalid when additional properties are present', () => {
-      const invalidInput = {
-        Codigo: '2021.1',
-        Inicio: '2021-01-01',
-        Fim: '2021-06-30',
-        Disciplinas: [
-          {
-            Disciplina: {
-              Nome: 'Disciplina A',
-              Codigo: '1',
-              Creditos: '1',
-              CargaHoraria: '1',
-              Situacao: 'Aprovado',
-              Nota: '10.00',
-            },
-          },
-        ],
-        ExtraProperty: 'not-allowed',
-      };
+    it('should return invalid when additional properties are present', async () => {
+      const invalidInput = await loadFixture(
+        'v1.0/schemas/academico-types/periodo/valid-required-periodo-type.json',
+        { ExtraProperty: 'not-allowed' },
+      );
 
       const typeValidator = ajvInstance.getSchema(periodoTypeRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -361,24 +271,11 @@ describe('Acadêmico Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return valid when all required properties are provided', () => {
-      const validInput = {
-        Codigo: '2021.1',
-        Inicio: '2021-01-01',
-        Fim: '2021-06-30',
-        Disciplinas: [
-          {
-            Disciplina: {
-              Nome: 'Disciplina A',
-              Codigo: '1',
-              Creditos: '1',
-              CargaHoraria: '1',
-              Situacao: 'Aprovado',
-              Nota: '10.00',
-            },
-          },
-        ],
-      };
+    it('should return valid when all required properties are provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/academico-types/periodo/valid-required-periodo-type.json',
+      );
+
       const typeValidator = ajvInstance.getSchema(periodoTypeRef)!;
       const validationResult = typeValidator(validInput);
 
@@ -415,29 +312,13 @@ describe('Acadêmico Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return invalid when an array item has additional properties', () => {
-      const invalidInput = [
-        {
-          Periodo: {
-            Codigo: '2021.1',
-            Inicio: '2021-01-01',
-            Fim: '2021-06-30',
-            Disciplinas: [
-              {
-                Disciplina: {
-                  Nome: 'Disciplina A',
-                  Codigo: '1',
-                  Creditos: '1',
-                  CargaHoraria: '1',
-                  Situacao: 'Aprovado',
-                  Nota: '10.00',
-                },
-              },
-            ],
-            ExtraProperty: 'not-allowed',
-          },
-        },
-      ];
+    it('should return invalid when an array item has additional properties', async () => {
+      const invalidItem = await loadFixture(
+        'v1.0/schemas/academico-types/periodo/valid-required-periodo.json',
+        { ExtraProperty: 'not-allowed' },
+      );
+
+      const invalidInput = [invalidItem];
 
       const typeValidator = ajvInstance.getSchema(periodoArrayTypeRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -449,47 +330,12 @@ describe('Acadêmico Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return invalid when the array contains duplicated items', () => {
-      const invalidInput = [
-        {
-          Periodo: {
-            Codigo: '2021.1',
-            Inicio: '2021-01-01',
-            Fim: '2021-06-30',
-            Disciplinas: [
-              {
-                Disciplina: {
-                  Nome: 'Disciplina A',
-                  Codigo: '1',
-                  Creditos: '1',
-                  CargaHoraria: '1',
-                  Situacao: 'Aprovado',
-                  Nota: '10.00',
-                },
-              },
-            ],
-          },
-        },
-        {
-          Periodo: {
-            Codigo: '2021.1',
-            Inicio: '2021-01-01',
-            Fim: '2021-06-30',
-            Disciplinas: [
-              {
-                Disciplina: {
-                  Nome: 'Disciplina A',
-                  Codigo: '1',
-                  Creditos: '1',
-                  CargaHoraria: '1',
-                  Situacao: 'Aprovado',
-                  Nota: '10.00',
-                },
-              },
-            ],
-          },
-        },
-      ];
+    it('should return invalid when the array contains duplicated items', async () => {
+      const validItem = await loadFixture(
+        'v1.0/schemas/academico-types/periodo/valid-required-periodo.json',
+      );
+
+      const invalidInput = [validItem, validItem];
 
       const typeValidator = ajvInstance.getSchema(periodoArrayTypeRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -501,47 +347,10 @@ describe('Acadêmico Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return valid when multiple valid array items are provided', () => {
-      const validInput = [
-        {
-          Periodo: {
-            Codigo: '2021.1',
-            Inicio: '2021-01-01',
-            Fim: '2021-06-30',
-            Disciplinas: [
-              {
-                Disciplina: {
-                  Nome: 'Disciplina A',
-                  Codigo: '1',
-                  Creditos: '1',
-                  CargaHoraria: '1',
-                  Situacao: 'Aprovado',
-                  Nota: '10.00',
-                },
-              },
-            ],
-          },
-        },
-        {
-          Periodo: {
-            Codigo: '2021.2',
-            Inicio: '2021-07-01',
-            Fim: '2021-12-31',
-            Disciplinas: [
-              {
-                Disciplina: {
-                  Nome: 'Disciplina A',
-                  Codigo: '1',
-                  Creditos: '1',
-                  CargaHoraria: '1',
-                  Situacao: 'Aprovado',
-                  Nota: '10.00',
-                },
-              },
-            ],
-          },
-        },
-      ];
+    it('should return valid when multiple valid array items are provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/academico-types/periodo/valid-required-periodo-array.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(periodoArrayTypeRef)!;
       const validationResult = typeValidator(validInput);

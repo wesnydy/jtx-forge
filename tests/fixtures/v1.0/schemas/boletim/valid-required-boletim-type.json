@@ -1,0 +1,53 @@
+{
+  "Versao": "1.0",
+  "Cabecalho": {
+    "Instituicao": {
+      "Nome": "Instituto Teste",
+      "CNPJ": "12345678000195",
+      "Endereco": {
+        "Logradouro": "Rua A",
+        "Numero": "1",
+        "Bairro": "Centro",
+        "Cidade": "Cidade",
+        "UF": "PB",
+        "CEP": "58051380"
+      }
+    },
+    "IdentificadorDocumento": "doc-1",
+    "DataEmissao": "2020-01-01"
+  },
+  "Estudante": {
+    "ID": "est-1",
+    "Nome": "Aluno Teste",
+    "CPF": "20122242756"
+  },
+  "Curso": {
+    "Nome": "Curso Teste",
+    "Codigo": "1"
+  },
+  "Periodos": [
+    {
+      "Periodo": {
+        "Codigo": "P1",
+        "Inicio": "2020-01-01",
+        "Fim": "2020-06-01",
+        "Disciplinas": [
+          {
+            "Disciplina": {
+              "Nome": "Disciplina A",
+              "Codigo": "1",
+              "Creditos": "1",
+              "CargaHoraria": "1",
+              "Situacao": "Aprovado",
+              "Nota": "10.00"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "ResumoAcademico": {
+    "CRA": "0.00",
+    "TotalCreditosConcluidos": "0.00"
+  }
+}

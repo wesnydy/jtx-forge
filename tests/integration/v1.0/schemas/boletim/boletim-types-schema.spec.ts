@@ -11,49 +11,29 @@ describe('Boletim Types JSON Schema v1.0', () => {
   let ajvInstance: Ajv;
 
   beforeAll(async () => {
-    const boletimTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/boletim/boletim-types.schema.json',
-      ),
-      'utf-8',
-    );
-    const boletimTypesObject = JSON.parse(boletimTypesString);
+    const schemasPath = path.resolve(__dirname, '../../../../../lib/versions/v1.0/schemas/json');
 
-    const simpleTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/shared/simple-types.schema.json',
-      ),
-      'utf-8',
-    );
-    const simpleTypesObject = JSON.parse(simpleTypesString);
+    const schemasFiles = await Promise.all([
+      fs.readFile(path.join(schemasPath, 'boletim/boletim-types.schema.json'), 'utf-8'),
+      fs.readFile(path.join(schemasPath, 'shared/institucional-types.schema.json'), 'utf-8'),
+      fs.readFile(path.join(schemasPath, 'shared/localizacao-types.schema.json'), 'utf-8'),
+      fs.readFile(path.join(schemasPath, 'shared/simple-types.schema.json'), 'utf-8'),
+    ]);
 
-    const institucionalTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/shared/institucional-types.schema.json',
-      ),
-      'utf-8',
-    );
-    const institucionalTypesObject = JSON.parse(institucionalTypesString);
-
-    const localizacaoTypesString = await fs.readFile(
-      path.resolve(
-        __dirname,
-        '../../../../../lib/versions/v1.0/schemas/json/shared/localizacao-types.schema.json',
-      ),
-      'utf-8',
-    );
-    const localizacaoTypesObject = JSON.parse(localizacaoTypesString);
+    const [
+      boletimTypesSchema,
+      institucionalTypesSchema,
+      localizacaoTypesSchema,
+      simpleTypesSchema,
+    ] = schemasFiles.map((file) => JSON.parse(file));
 
     ajvInstance = new Ajv({ allErrors: true, strict: false });
     addFormats(ajvInstance);
 
-    ajvInstance.addSchema(simpleTypesObject, simpleTypesObject.$id);
-    ajvInstance.addSchema(localizacaoTypesObject, localizacaoTypesObject.$id);
-    ajvInstance.addSchema(institucionalTypesObject, institucionalTypesObject.$id);
-    ajvInstance.addSchema(boletimTypesObject, boletimTypesObject.$id);
+    ajvInstance.addSchema(simpleTypesSchema, simpleTypesSchema.$id);
+    ajvInstance.addSchema(localizacaoTypesSchema, localizacaoTypesSchema.$id);
+    ajvInstance.addSchema(institucionalTypesSchema, institucionalTypesSchema.$id);
+    ajvInstance.addSchema(boletimTypesSchema, boletimTypesSchema.$id);
   });
 
   describe('CabecalhoType validations', () => {

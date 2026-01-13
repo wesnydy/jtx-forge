@@ -1,0 +1,12 @@
+{
+  "Nome": "Instituto Teste",
+  "CNPJ": "12345678000195",
+  "Endereco": {
+    "Logradouro": "Rua A",
+    "Numero": "1",
+    "Bairro": "Centro",
+    "Cidade": "Cidade",
+    "UF": "PB",
+    "CEP": "58051380"
+  }
+}
