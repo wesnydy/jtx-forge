@@ -17,7 +17,7 @@ import { DefinedError } from 'ajv';
 import DocumentValidator from '@/core/validator/document.validator.interface';
 import { DocumentType, StandardsVersion, ValidationResult } from '@/core/types';
 
-import { BoletimType } from '../../types/boletim/boletim';
+import { BoletimType } from '../../types/boletim/boletim.schema';
 
 import JSONSchemaURIs from '../../utils/json-schema-uris';
 import ajvErrorString from '../../utils/ajv-error-string';

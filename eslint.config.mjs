@@ -22,6 +22,12 @@ export default tseslint.config(
           arrowParens: 'always',
         },
       ],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+        },
+      ],
     },
   },
 );

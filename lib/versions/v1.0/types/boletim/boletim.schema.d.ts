@@ -6,6 +6,28 @@
  */
 
 export type BoletimSchema = Boletim | LoteBoletim;
+/**
+ * @minItems 1
+ */
+export type PeriodoArrayType = [
+  {
+    Periodo: PeriodoType;
+  },
+  ...{
+    Periodo: PeriodoType;
+  }[]
+];
+/**
+ * @minItems 1
+ */
+export type DisciplinaArrayType = [
+  {
+    Disciplina: DisciplinaType;
+  },
+  ...{
+    Disciplina: DisciplinaType;
+  }[]
+];
 export type DisciplinaType = {
   Nome: string;
   Codigo: string;
@@ -14,62 +36,51 @@ export type DisciplinaType = {
   Frequencia?: string;
   Situacao: "Aprovado" | "Reprovado" | "Recuperação" | "Matriculado" | "Dispensado";
   Comentarios?: string;
+  Nota?: unknown;
+  NotaEscala?: unknown;
 } & (
   | {
       Nota: string;
+      [k: string]: unknown;
     }
   | {
       NotaEscala: "A" | "B" | "C" | "D" | "E" | "F";
+      [k: string]: unknown;
     }
 );
 /**
  * @minItems 1
  */
-export type LoteBoletim = [
+export type AssinaturaArrayType = [
   {
-    Boletim: BoletimType;
+    Assinatura: AssinaturaType;
   },
   ...{
-    Boletim: BoletimType;
+    Assinatura: AssinaturaType;
   }[]
 ];
+/**
+ * @minItems 1
+ */
+export type LoteBoletim = [Boletim, ...Boletim[]];
 
 export interface Boletim {
   Boletim: BoletimType;
 }
 export interface BoletimType {
   Versao: "1.0";
-  Cabecalho: {
-    Instituicao: InstituicaoType;
-    IdentificadorDocumento: string;
-    Emitente?: string;
-    DataEmissao: string;
-  };
+  Cabecalho: CabecalhoType;
   Estudante: EstudanteType;
   Curso: CursoType;
-  /**
-   * @minItems 1
-   */
-  Periodos: [
-    {
-      Periodo: PeriodoType;
-    },
-    ...{
-      Periodo: PeriodoType;
-    }[]
-  ];
+  Periodos: PeriodoArrayType;
   ResumoAcademico: ResumoAcademicoType;
-  /**
-   * @minItems 1
-   */
-  Assinaturas?: [
-    {
-      Assinatura: AssinaturaType;
-    },
-    ...{
-      Assinatura: AssinaturaType;
-    }[]
-  ];
+  Assinaturas?: AssinaturaArrayType;
+}
+export interface CabecalhoType {
+  Instituicao: InstituicaoType;
+  IdentificadorDocumento: string;
+  Emitente?: string;
+  DataEmissao: string;
 }
 export interface InstituicaoType {
   Nome: string;
@@ -132,17 +143,7 @@ export interface PeriodoType {
   Codigo: string;
   Inicio: string;
   Fim: string;
-  /**
-   * @minItems 1
-   */
-  Disciplinas: [
-    {
-      Disciplina: DisciplinaType;
-    },
-    ...{
-      Disciplina: DisciplinaType;
-    }[]
-  ];
+  Disciplinas: DisciplinaArrayType;
 }
 export interface ResumoAcademicoType {
   CRA: string;

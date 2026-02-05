@@ -6,33 +6,33 @@
  */
 
 /**
+ * @minItems 1
+ *
  * This interface was referenced by `BoletimTypesSchema`'s JSON-Schema
- * via the `definition` "DisciplinaType".
+ * via the `definition` "AssinaturaArrayType".
  */
-export type DisciplinaType = {
-  Nome: string;
-  Codigo: string;
-  Creditos: string;
-  CargaHoraria: string;
-  Frequencia?: string;
-  Situacao: "Aprovado" | "Reprovado" | "Recuperação" | "Matriculado" | "Dispensado";
-  Comentarios?: string;
-} & DisciplinaType1;
-export type DisciplinaType1 =
-  | {
-      Nota: string;
-    }
-  | {
-      NotaEscala: "A" | "B" | "C" | "D" | "E" | "F";
-    };
+export type AssinaturaArrayType = [
+  {
+    Assinatura: AssinaturaType;
+  },
+  ...{
+    Assinatura: AssinaturaType;
+  }[]
+];
 
 export interface BoletimTypesSchema {
   [k: string]: unknown;
 }
 /**
  * This interface was referenced by `BoletimTypesSchema`'s JSON-Schema
- * via the `definition` "InstituicaoType".
+ * via the `definition` "CabecalhoType".
  */
+export interface CabecalhoType {
+  Instituicao: InstituicaoType;
+  IdentificadorDocumento: string;
+  Emitente?: string;
+  DataEmissao: string;
+}
 export interface InstituicaoType {
   Nome: string;
   CNPJ: string;
@@ -40,10 +40,6 @@ export interface InstituicaoType {
   Endereco: EnderecoType;
   Contato?: ContatoType;
 }
-/**
- * This interface was referenced by `BoletimTypesSchema`'s JSON-Schema
- * via the `definition` "EnderecoType".
- */
 export interface EnderecoType {
   Logradouro: string;
   Numero: string;
@@ -80,51 +76,9 @@ export interface EnderecoType {
     | "TO";
   CEP: string;
 }
-/**
- * This interface was referenced by `BoletimTypesSchema`'s JSON-Schema
- * via the `definition` "ContatoType".
- */
 export interface ContatoType {
   Telefone: string;
   Email?: string;
-}
-/**
- * This interface was referenced by `BoletimTypesSchema`'s JSON-Schema
- * via the `definition` "EstudanteType".
- */
-export interface EstudanteType {
-  ID: string;
-  Nome: string;
-  CPF: string;
-}
-/**
- * This interface was referenced by `BoletimTypesSchema`'s JSON-Schema
- * via the `definition` "CursoType".
- */
-export interface CursoType {
-  Nome: string;
-  Codigo: string;
-  Nivel?: "Bacharelado" | "Licenciatura" | "Tecnólogo";
-}
-/**
- * This interface was referenced by `BoletimTypesSchema`'s JSON-Schema
- * via the `definition` "PeriodoType".
- */
-export interface PeriodoType {
-  Codigo: string;
-  Inicio: string;
-  Fim: string;
-  /**
-   * @minItems 1
-   */
-  Disciplinas: [
-    {
-      Disciplina: DisciplinaType;
-    },
-    ...{
-      Disciplina: DisciplinaType;
-    }[]
-  ];
 }
 /**
  * This interface was referenced by `BoletimTypesSchema`'s JSON-Schema

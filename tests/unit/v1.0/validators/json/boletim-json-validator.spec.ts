@@ -7,7 +7,7 @@ jest.mock('@/versions/v1.0/utils/ajv-instance-cache', () => ({
   },
 }));
 
-import { BoletimType } from '@/versions/v1.0/types/boletim/boletim';
+import { BoletimType } from '@/versions/v1.0/types/boletim/boletim.schema';
 import ajvInstanceCache from '@/versions/v1.0/utils/ajv-instance-cache';
 import JSONSchemaURIs from '@/versions/v1.0/utils/json-schema-uris';
 import BoletimValidator from '@/versions/v1.0/validators/json/boletim';
@@ -35,9 +35,9 @@ describe('Boletim JSON Validator v1.0', () => {
     });
 
     it('should return validation as false with an errors list when input is invalid', () => {
-      const mockValidate = jest.fn() as jest.Mock & { errors?: unknown[] };
-      mockValidate.mockReturnValue(false);
-      mockValidate.errors = [
+      const validateMock = jest.fn() as jest.Mock & { errors?: unknown[] };
+      validateMock.mockReturnValue(false);
+      validateMock.errors = [
         {
           instancePath: '/Boletim/Versao',
           schemaPath: '#/properties/Versao/const',
@@ -50,7 +50,7 @@ describe('Boletim JSON Validator v1.0', () => {
         },
       ];
 
-      (ajvInstanceCache.getSchema as jest.Mock).mockImplementationOnce(() => mockValidate);
+      (ajvInstanceCache.getSchema as jest.Mock).mockImplementationOnce(() => validateMock);
 
       const validationResult = validator.validate({} as BoletimType);
 
@@ -60,11 +60,11 @@ describe('Boletim JSON Validator v1.0', () => {
     });
 
     it('should return an empty errors list when input is invalid but no validation errors are provided', () => {
-      const mockValidate = jest.fn() as jest.Mock & { errors?: unknown[] };
-      mockValidate.mockReturnValue(false);
-      mockValidate.errors = undefined;
+      const validateMock = jest.fn() as jest.Mock & { errors?: unknown[] };
+      validateMock.mockReturnValue(false);
+      validateMock.errors = undefined;
 
-      (ajvInstanceCache.getSchema as jest.Mock).mockImplementationOnce(() => mockValidate);
+      (ajvInstanceCache.getSchema as jest.Mock).mockImplementationOnce(() => validateMock);
 
       const validationResult = validator.validate({} as BoletimType);
 
@@ -75,10 +75,10 @@ describe('Boletim JSON Validator v1.0', () => {
 
   describe('Validation success handling', () => {
     it('should return validation as true with an empty errors list when input is valid', () => {
-      const mockValidate = jest.fn() as jest.Mock & { errors?: unknown[] };
-      mockValidate.mockReturnValue(true);
+      const validateMock = jest.fn() as jest.Mock & { errors?: unknown[] };
+      validateMock.mockReturnValue(true);
 
-      (ajvInstanceCache.getSchema as jest.Mock).mockImplementationOnce(() => mockValidate);
+      (ajvInstanceCache.getSchema as jest.Mock).mockImplementationOnce(() => validateMock);
 
       const validationResult = validator.validate({} as BoletimType);
 
