@@ -5,8 +5,8 @@ import BaseDocumentBuilder from '@/versions/v1.0/builders/base-document-builder'
 
 class BaseDocumentBuilderMock extends BaseDocumentBuilder<{ key: string; value: string }> {
   readonly type: DocumentType = 'boletim';
-  build(json: { key: string; value: string }): string {
-    return `<mock><key>${json.key}</key><value>${json.value}</value></mock>`;
+  build(_json: { key: string; value: string }): string {
+    return '';
   }
 }
 
