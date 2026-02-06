@@ -19,15 +19,13 @@ import { StandardsVersion } from '@/core/types';
 export default abstract class BaseBuilder {
   protected readonly version: StandardsVersion = 'v1.0';
 
-  abstract getKey(): string;
-
   protected addReqElement<O extends object, K extends keyof O & string>(
     parent: XMLBuilder,
     field: K,
     json: O,
   ): XMLBuilder {
     if (json[field] == null) {
-      throw new Error(`Field '${field}' is required in ${this.getKey()}`);
+      throw new Error(`Field '${field}' is required`);
     } else if (typeof json[field] !== 'object' && !Array.isArray(json[field])) {
       return this.addElement(parent, field, String(json[field]));
     }
@@ -59,14 +57,14 @@ export default abstract class BaseBuilder {
       if (field in json) {
         const typedField = field as keyof O & string;
         if (json[typedField] == null) {
-          throw new Error(`Field '${field}' is required in ${this.getKey()}`);
+          throw new Error(`Field '${field}' is required`);
         } else if (typeof json[typedField] !== 'object' && !Array.isArray(json[typedField])) {
           return this.addElement(parent, typedField, String(json[typedField]));
         }
         return this.addElement(parent, typedField);
       }
     }
-    throw new Error(`One of the fields ${fields} is required in ${this.getKey()}`);
+    throw new Error(`One of the fields ${fields} is required`);
   }
 
   protected addElement(parent: XMLBuilder, name: string, value?: string): XMLBuilder {

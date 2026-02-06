@@ -4,10 +4,6 @@ import type { XMLBuilder } from 'xmlbuilder2/lib/interfaces';
 import BaseBuilder from '@/versions/v1.0/builders/base-builder';
 
 class BaseBuilderMock extends BaseBuilder {
-  public getKey(): string {
-    return `mock:${this.version}`;
-  }
-
   public testAddReqElement<O extends object, K extends keyof O & string>(
     parent: XMLBuilder,
     field: K,
@@ -55,18 +51,6 @@ describe('BaseBuilder v1.0', () => {
     baseBuilderMock = new BaseBuilderMock();
   });
 
-  describe('getKey', () => {
-    it('should return the correct key format when getting the key value', () => {
-      const key = baseBuilderMock.getKey();
-      expect(key).toBe('mock:v1.0');
-    });
-
-    it('should include version in key when getting the key value', () => {
-      const key = baseBuilderMock.getKey();
-      expect(key).toContain('v1.0');
-    });
-  });
-
   describe('addReqElement', () => {
     it('should throw an error when the value from json[field] is null', () => {
       const field = 'example-field';
@@ -74,7 +58,7 @@ describe('BaseBuilder v1.0', () => {
 
       expect(() => {
         baseBuilderMock.testAddReqElement(xmlParentMock, field, json);
-      }).toThrow(`Field '${field}' is required in ${baseBuilderMock.getKey()}`);
+      }).toThrow(`Field '${field}' is required`);
     });
 
     it('should throw an error when the value from json[field] is undefined', () => {
@@ -83,7 +67,7 @@ describe('BaseBuilder v1.0', () => {
 
       expect(() => {
         baseBuilderMock.testAddReqElement(xmlParentMock, field, json);
-      }).toThrow(`Field '${field}' is required in ${baseBuilderMock.getKey()}`);
+      }).toThrow(`Field '${field}' is required`);
     });
 
     it('should add a required element with text when the value from json[field] is a string', () => {
@@ -214,7 +198,7 @@ describe('BaseBuilder v1.0', () => {
 
       expect(() => {
         baseBuilderMock.testAddOneElement(xmlParentMock, fields, json);
-      }).toThrow(`One of the fields ${fields} is required in ${baseBuilderMock.getKey()}`);
+      }).toThrow(`One of the fields ${fields} is required`);
     });
 
     it('should throw an error when the first matching element present in json is null', () => {
@@ -223,7 +207,7 @@ describe('BaseBuilder v1.0', () => {
 
       expect(() => {
         baseBuilderMock.testAddOneElement(xmlParentMock, fields, json);
-      }).toThrow(`Field '${fields[0]}' is required in ${baseBuilderMock.getKey()}`);
+      }).toThrow(`Field '${fields[0]}' is required`);
     });
 
     it('should return null when the list of possible elements is empty', () => {
