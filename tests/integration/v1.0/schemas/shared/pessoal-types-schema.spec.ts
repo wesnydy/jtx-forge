@@ -29,7 +29,7 @@ describe('Pessoal Types JSON Schema v1.0', () => {
     ajvInstance.addSchema(pessoalTypesSchema, pessoalTypesSchema.$id);
   });
 
-  describe('PessoalType validations', () => {
+  describe('EstudanteType validations', () => {
     const pessoalTypeRef = `${JSONSchemaURIs.pessoalTypesURI}#/$defs/EstudanteType`;
 
     it('should return invalid when the required properties are missing', () => {
@@ -48,7 +48,7 @@ describe('Pessoal Types JSON Schema v1.0', () => {
 
     it('should return invalid when additional properties are present', async () => {
       const invalidInput = await loadFixture(
-        'v1.0/schemas/pessoal-types/valid-required-pessoal-type.json',
+        'v1.0/schemas/pessoal-types/estudante/valid-required-estudante-type.json',
         { ExtraProperty: 'not-allowed' },
       );
 
@@ -64,7 +64,7 @@ describe('Pessoal Types JSON Schema v1.0', () => {
 
     it('should return valid when all required properties are provided', async () => {
       const validInput = await loadFixture(
-        'v1.0/schemas/pessoal-types/valid-required-pessoal-type.json',
+        'v1.0/schemas/pessoal-types/estudante/valid-required-estudante-type.json',
       );
 
       const typeValidator = ajvInstance.getSchema(pessoalTypeRef)!;
