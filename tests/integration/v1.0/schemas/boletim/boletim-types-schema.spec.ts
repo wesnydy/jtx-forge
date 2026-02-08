@@ -5,7 +5,9 @@ import path from 'node:path';
 
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
+
 import JSONSchemaURIs from '@/versions/v1.0/utils/json-schema-uris';
+import loadFixture from '@tests/utils/load-fixture';
 
 describe('Boletim Types JSON Schema v1.0', () => {
   let ajvInstance: Ajv;
@@ -53,24 +55,11 @@ describe('Boletim Types JSON Schema v1.0', () => {
       ]);
     });
 
-    it('should return invalid when additional properties are present', () => {
-      const invalidInput = {
-        Instituicao: {
-          Nome: 'Instituto Teste',
-          CNPJ: '12345678000195',
-          Endereco: {
-            Logradouro: 'Rua A',
-            Numero: '1',
-            Bairro: 'Centro',
-            Cidade: 'Cidade',
-            UF: 'PB',
-            CEP: '58051380',
-          },
-        },
-        IdentificadorDocumento: 'doc-1',
-        DataEmissao: '2020-01-01',
-        ExtraProperty: 'not-allowed',
-      };
+    it('should return invalid when additional properties are present', async () => {
+      const invalidInput = await loadFixture(
+        'v1.0/schemas/boletim-types/cabecalho/valid-required-cabecalho-type.json',
+        { ExtraProperty: 'not-allowed' },
+      );
 
       const typeValidator = ajvInstance.getSchema(cabecalhoTypeRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -82,23 +71,10 @@ describe('Boletim Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return valid when only required properties are provided', () => {
-      const validInput = {
-        Instituicao: {
-          Nome: 'Instituto Teste',
-          CNPJ: '12345678000195',
-          Endereco: {
-            Logradouro: 'Rua A',
-            Numero: '1',
-            Bairro: 'Centro',
-            Cidade: 'Cidade',
-            UF: 'PB',
-            CEP: '58051380',
-          },
-        },
-        IdentificadorDocumento: 'doc-1',
-        DataEmissao: '2020-01-01',
-      };
+    it('should return valid when only required properties are provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/boletim-types/cabecalho/valid-required-cabecalho-type.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(cabecalhoTypeRef)!;
       const validationResult = typeValidator(validInput);
@@ -106,24 +82,10 @@ describe('Boletim Types JSON Schema v1.0', () => {
       expect(validationResult).toBe(true);
     });
 
-    it('should return valid when optional property "Emitente" is provided', () => {
-      const validInput = {
-        Instituicao: {
-          Nome: 'Instituto Teste',
-          CNPJ: '12345678000195',
-          Endereco: {
-            Logradouro: 'Rua A',
-            Numero: '1',
-            Bairro: 'Centro',
-            Cidade: 'Cidade',
-            UF: 'PB',
-            CEP: '58051380',
-          },
-        },
-        IdentificadorDocumento: 'doc-1',
-        DataEmissao: '2020-01-01',
-        Emitente: 'Secretaria Acadêmica',
-      };
+    it('should return valid when optional property "Emitente" is provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/boletim-types/cabecalho/valid-complete-cabecalho-type.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(cabecalhoTypeRef)!;
       const validationResult = typeValidator(validInput);
@@ -148,12 +110,11 @@ describe('Boletim Types JSON Schema v1.0', () => {
       ]);
     });
 
-    it('should return invalid when additional properties are present', () => {
-      const invalidInput = {
-        CRA: '0.00',
-        TotalCreditosConcluidos: '0.00',
-        ExtraProperty: 'not-allowed',
-      };
+    it('should return invalid when additional properties are present', async () => {
+      const invalidInput = await loadFixture(
+        'v1.0/schemas/boletim-types/resumo-academico/valid-required-resumo-academico-type.json',
+        { ExtraProperty: 'not-allowed' },
+      );
 
       const typeValidator = ajvInstance.getSchema(resumoAcademicoTypeRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -165,11 +126,10 @@ describe('Boletim Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return valid when only required properties are provided', () => {
-      const validInput = {
-        CRA: '0.00',
-        TotalCreditosConcluidos: '0.00',
-      };
+    it('should return valid when only required properties are provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/boletim-types/resumo-academico/valid-required-resumo-academico-type.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(resumoAcademicoTypeRef)!;
       const validationResult = typeValidator(validInput);
@@ -177,12 +137,10 @@ describe('Boletim Types JSON Schema v1.0', () => {
       expect(validationResult).toBe(true);
     });
 
-    it('should return valid when optional property "Observacoes" is provided', () => {
-      const validInput = {
-        CRA: '8.50',
-        TotalCreditosConcluidos: '120.00',
-        Observacoes: 'Estudante em bom desempenho',
-      };
+    it('should return valid when optional property "Observacoes" is provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/boletim-types/resumo-academico/valid-complete-resumo-academico-type.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(resumoAcademicoTypeRef)!;
       const validationResult = typeValidator(validInput);
@@ -209,14 +167,11 @@ describe('Boletim Types JSON Schema v1.0', () => {
       ]);
     });
 
-    it('should return invalid when additional properties are present', () => {
-      const invalidInput = {
-        NomeAssinador: 'Assinador Teste',
-        Cargo: 'Diretor',
-        Data: '2020-01-01',
-        AssinaturaDigital: 'abcdef1234567890',
-        ExtraProperty: 'not-allowed',
-      };
+    it('should return invalid when additional properties are present', async () => {
+      const invalidInput = await loadFixture(
+        'v1.0/schemas/boletim-types/assinatura/valid-required-assinatura-type.json',
+        { ExtraProperty: 'not-allowed' },
+      );
 
       const typeValidator = ajvInstance.getSchema(assinaturaTypeRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -228,13 +183,10 @@ describe('Boletim Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return valid when all required properties are provided', () => {
-      const validInput = {
-        NomeAssinador: 'Assinador Teste',
-        Cargo: 'Diretor',
-        Data: '2020-01-01',
-        AssinaturaDigital: 'abcdef1234567890',
-      };
+    it('should return valid when all required properties are provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/boletim-types/assinatura/valid-required-assinatura-type.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(assinaturaTypeRef)!;
       const validationResult = typeValidator(validInput);
@@ -272,18 +224,13 @@ describe('Boletim Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return invalid when an array item has additional properties', () => {
-      const invalidInput = [
-        {
-          Assinatura: {
-            NomeAssinador: 'Assinador Teste',
-            Cargo: 'Diretor',
-            Data: '2020-01-01',
-            AssinaturaDigital: 'abcdef1234567890',
-          },
-          ExtraProperty: 'not-allowed',
-        },
-      ];
+    it('should return invalid when an array item has additional properties', async () => {
+      const invalidItem = await loadFixture(
+        'v1.0/schemas/boletim-types/assinatura/valid-required-assinatura.json',
+        { ExtraProperty: 'not-allowed' },
+      );
+
+      const invalidInput = [invalidItem];
 
       const typeValidator = ajvInstance.getSchema(assinaturaArrayTypeRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -295,25 +242,12 @@ describe('Boletim Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return invalid when the array contains duplicated items', () => {
-      const invalidInput = [
-        {
-          Assinatura: {
-            NomeAssinador: 'Assinador Teste',
-            Cargo: 'Diretor',
-            Data: '2020-01-01',
-            AssinaturaDigital: 'abcdef1234567890',
-          },
-        },
-        {
-          Assinatura: {
-            NomeAssinador: 'Assinador Teste',
-            Cargo: 'Diretor',
-            Data: '2020-01-01',
-            AssinaturaDigital: 'abcdef1234567890',
-          },
-        },
-      ];
+    it('should return invalid when the array contains duplicated items', async () => {
+      const validItem = await loadFixture(
+        'v1.0/schemas/boletim-types/assinatura/valid-required-assinatura.json',
+      );
+
+      const invalidInput = [validItem, validItem];
 
       const typeValidator = ajvInstance.getSchema(assinaturaArrayTypeRef)!;
       const validationResult = typeValidator(invalidInput);
@@ -325,25 +259,10 @@ describe('Boletim Types JSON Schema v1.0', () => {
       });
     });
 
-    it('should return valid when multiple valid array items are provided', () => {
-      const validInput = [
-        {
-          Assinatura: {
-            NomeAssinador: 'Assinador Teste',
-            Cargo: 'Diretor',
-            Data: '2020-01-01',
-            AssinaturaDigital: 'abcdef1234567890',
-          },
-        },
-        {
-          Assinatura: {
-            NomeAssinador: 'Assinador Teste',
-            Cargo: 'Coordenadora',
-            Data: '2020-01-02',
-            AssinaturaDigital: '1234567890abcdef',
-          },
-        },
-      ];
+    it('should return valid when multiple valid array items are provided', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/boletim-types/assinatura/valid-required-assinatura-array.json',
+      );
 
       const typeValidator = ajvInstance.getSchema(assinaturaArrayTypeRef)!;
       const validationResult = typeValidator(validInput);

@@ -1,0 +1,8 @@
+{
+  "Assinatura": {
+    "NomeAssinador": "Assinatura Teste",
+    "Cargo": "Assinante",
+    "Data": "2020-01-01",
+    "AssinaturaDigital": "abcdef1234567890"
+  }
+}

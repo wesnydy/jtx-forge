@@ -52,7 +52,7 @@ describe('Institucional Types JSON Schema v1.0', () => {
 
     it('should return invalid when additional properties are present', async () => {
       const invalidInput = await loadFixture(
-        'v1.0/schemas/institucional-types/valid-required-instituicao-type.json',
+        'v1.0/schemas/institucional-types/instituicao/valid-required-instituicao-type.json',
         { ExtraProperty: 'not-allowed' },
       );
 
@@ -68,7 +68,7 @@ describe('Institucional Types JSON Schema v1.0', () => {
 
     it('should return valid when only required properties are provided', async () => {
       const validInput = await loadFixture(
-        'v1.0/schemas/institucional-types/valid-required-instituicao-type.json',
+        'v1.0/schemas/institucional-types/instituicao/valid-required-instituicao-type.json',
       );
 
       const typeValidator = ajvInstance.getSchema(instituicaoTypeRef)!;
@@ -79,7 +79,7 @@ describe('Institucional Types JSON Schema v1.0', () => {
 
     it('should return valid when optional properties are provided', async () => {
       const validInput = await loadFixture(
-        'v1.0/schemas/institucional-types/valid-optional-instituicao-type.json',
+        'v1.0/schemas/institucional-types/instituicao/valid-complete-instituicao-type.json',
       );
 
       const typeValidator = ajvInstance.getSchema(instituicaoTypeRef)!;

@@ -123,6 +123,7 @@ describe('Boletim JSON Schema v1.0', () => {
       const invalidItem = await loadFixture('v1.0/schemas/boletim/valid-required-boletim.json', {
         ExtraProperty: 'not-allowed',
       });
+
       const invalidInput = [invalidItem];
 
       const typeValidator = ajvInstance.getSchema(loteBoletimRef)!;
@@ -223,7 +224,7 @@ describe('Boletim JSON Schema v1.0', () => {
     });
 
     it('should return valid when optional property "Assinaturas" is provided', async () => {
-      const validInput = await loadFixture('v1.0/schemas/boletim/valid-optional-boletim-type.json');
+      const validInput = await loadFixture('v1.0/schemas/boletim/valid-complete-boletim-type.json');
 
       const typeValidator = ajvInstance.getSchema(boletimTypeRef)!;
       const validationResult = typeValidator(validInput);

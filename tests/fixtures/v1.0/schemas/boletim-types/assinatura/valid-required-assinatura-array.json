@@ -1,0 +1,18 @@
+[
+  {
+    "Assinatura": {
+      "NomeAssinador": "Assinatura Teste A",
+      "Cargo": "Assinante",
+      "Data": "2020-01-01",
+      "AssinaturaDigital": "abcdef1234567890"
+    }
+  },
+  {
+    "Assinatura": {
+      "NomeAssinador": "Assinatura Teste B",
+      "Cargo": "Assinante",
+      "Data": "2020-01-01",
+      "AssinaturaDigital": "ghijkl1234567890"
+    }
+  }
+]

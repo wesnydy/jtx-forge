@@ -74,7 +74,7 @@ describe('Acadêmico Types JSON Schema v1.0', () => {
 
     it('should return valid when optional property "Nivel" is provided', async () => {
       const validInput = await loadFixture(
-        'v1.0/schemas/academico-types/curso/valid-optional-curso-type.json',
+        'v1.0/schemas/academico-types/curso/valid-complete-curso-type.json',
       );
 
       const typeValidator = ajvInstance.getSchema(cursoTypeRef)!;
@@ -151,7 +151,7 @@ describe('Acadêmico Types JSON Schema v1.0', () => {
 
     it('should return valid when optional properties are provided', async () => {
       const validInput = await loadFixture(
-        'v1.0/schemas/academico-types/disciplina/valid-optional-disciplina-type.json',
+        'v1.0/schemas/academico-types/disciplina/valid-complete-disciplina-type.json',
       );
 
       const typeValidator = ajvInstance.getSchema(disciplinaTypeRef)!;

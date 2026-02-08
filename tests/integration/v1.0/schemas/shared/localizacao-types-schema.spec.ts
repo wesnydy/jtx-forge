@@ -80,7 +80,7 @@ describe('Localização Types JSON Schema v1.0', () => {
 
     it('should return valid when optional property "Complemento" is provided', async () => {
       const validInput = await loadFixture(
-        'v1.0/schemas/localizacao-types/endereco/valid-optional-endereco-type.json',
+        'v1.0/schemas/localizacao-types/endereco/valid-complete-endereco-type.json',
       );
 
       const typeValidator = ajvInstance.getSchema(enderecoTypeRef)!;
@@ -134,7 +134,7 @@ describe('Localização Types JSON Schema v1.0', () => {
 
     it('should return valid when optional property "Email" is provided', async () => {
       const validInput = await loadFixture(
-        'v1.0/schemas/localizacao-types/contato/valid-optional-contato-type.json',
+        'v1.0/schemas/localizacao-types/contato/valid-complete-contato-type.json',
       );
 
       const typeValidator = ajvInstance.getSchema(contatoTypeRef)!;
