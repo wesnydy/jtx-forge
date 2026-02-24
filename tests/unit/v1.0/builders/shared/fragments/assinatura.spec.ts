@@ -39,10 +39,13 @@ describe('AssinaturaFragmentBuilder v1.0', () => {
   });
 
   describe('build', () => {
-    it('should throw an error when each assinatura required property is missing', () => {
-      for (const key of Object.keys(validRequiredInput)) {
-        const invalidInput = { ...validRequiredInput } as AssinaturaType;
+    it('should throw an error for each required property when it is missing', () => {
+      expect.hasAssertions();
 
+      for (const key of Object.keys(validRequiredInput)) {
+        jest.clearAllMocks();
+
+        const invalidInput = { ...validRequiredInput } as AssinaturaType;
         delete invalidInput[key as keyof AssinaturaType];
 
         expect(() => {
@@ -51,7 +54,7 @@ describe('AssinaturaFragmentBuilder v1.0', () => {
       }
     });
 
-    it('should return a string when building assinatura fragment with a valid json', () => {
+    it('should return a string when building fragment with a valid json', () => {
       const result = fragmentBuilder.build(validRequiredInput, xmlParentMock);
 
       expect(typeof result).toBe('string');
