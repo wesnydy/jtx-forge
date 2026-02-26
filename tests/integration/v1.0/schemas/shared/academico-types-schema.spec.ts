@@ -149,6 +149,28 @@ describe('Acadêmico Types JSON Schema v1.0', () => {
       expect(validationResult).toBe(true);
     });
 
+    it('should return valid when only "Nota" property is provided in oneOf schema', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/academico-types/disciplina/oneof/only-nota-disciplina-type.json',
+      );
+
+      const typeValidator = ajvInstance.getSchema(disciplinaTypeRef)!;
+      const validationResult = typeValidator(validInput);
+
+      expect(validationResult).toBe(true);
+    });
+
+    it('should return valid when only "NotaEscala" property is provided in oneOf schema', async () => {
+      const validInput = await loadFixture(
+        'v1.0/schemas/academico-types/disciplina/oneof/only-nota-escala-disciplina-type.json',
+      );
+
+      const typeValidator = ajvInstance.getSchema(disciplinaTypeRef)!;
+      const validationResult = typeValidator(validInput);
+
+      expect(validationResult).toBe(true);
+    });
+
     it('should return valid when optional properties are provided', async () => {
       const validInput = await loadFixture(
         'v1.0/schemas/academico-types/disciplina/valid-complete-disciplina-type.json',

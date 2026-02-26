@@ -198,7 +198,7 @@ describe('BaseBuilder v1.0', () => {
 
       expect(() => {
         baseBuilderMock.testAddOneElement(xmlParentMock, fields, json);
-      }).toThrow(`One of the fields ${fields} is required`);
+      }).toThrow(`One of the fields '${fields}' is required`);
     });
 
     it('should throw an error when the first matching element present in json is null', () => {

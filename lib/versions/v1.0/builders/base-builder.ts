@@ -64,7 +64,7 @@ export default abstract class BaseBuilder {
         return this.addElement(parent, typedField);
       }
     }
-    throw new Error(`One of the fields ${fields} is required`);
+    throw new Error(`One of the fields '${fields}' is required`);
   }
 
   protected addElement(parent: XMLBuilder, name: string, value?: string): XMLBuilder {
